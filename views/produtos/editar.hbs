@@ -1,0 +1,50 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Velocidade de Produção</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{produto.id}}</th>
+            <td>{{produto.nome}}</td>
+            <td>{{produto.descricao}}</td>
+            <td>{{produto.velocidade}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-4 ">
+      <!-- Formulário de Edição-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded formEditarProduto">
+        <h4>Editar Produto:</h4>
+        <form class="m-2" action="/produtos/editar/{{produto.id}}" method="POST">
+          <div class="form-group">
+            <label for="nome" id="nome">Nome</label>
+            <input type="text" class="form-control" id="nome" name="nome" value="{{produto.nome}}">
+          </div>
+          <div class="form-group">
+            <label for="descricao" id="descricao">Descrição</label>
+            <input type="text" class="form-control" id="descricao" name="descricao" value="{{produto.descricao}}">
+          </div>
+          <div class="form-group">
+            <label for="velocidade" id="velocidade">Velocidade de Produção</label>
+            <input type="text" class="form-control" id="velocidade" name="velocidade" value="{{produto.velocidade}}">
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="button" class="btn btn-secondary">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Velocidade de Produção</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each produtos}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{nome}}</td>
+            <td>{{descricao}}</td>
+            <td>{{velocidade}}</td>
+            <td style='width: 40px'>
+              <a href="produtos/editar/{{id}}">
+                <button type="button" class="btn btn-light">
+                  <img src="/bootstrap/icons/pencil-square.svg" alt="editar" width="24" height="24" title="editar">
+                </button>
+              </a>
+            </td>
+          </tr>
+          {{else}}
+          <tr>
+            <th scope="row">-</th>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-4 ">
+      <!-- Formulário de cadastro-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded formCadastrarProduto">
+        <h4>Cadastrar Produto:</h4>
+        <form class="m-2" action="/produtos/criar" method="POST">
+          <div class="form-group">
+            <label for="nome" id="nome">Nome</label>
+            <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome do produto">
+          </div>
+          <div class="form-group">
+            <label for="descricao" id="descricao">Descrição</label>
+            <input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição do produto">
+          </div>
+          <div class="form-group">
+            <label for="velocidade" id="velocidade">Velocidade de Produção</label>
+            <input type="text" class="form-control" id="velocidade" name="velocidade" placeholder="quantidade por hora">
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="reset" class="btn btn-secondary">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /*
+      Funcionalidade de alternar a visibilidade dos formulários
+
+  //referência os formulários
+  var formEditarProduto = document.querySelector('.formEditarProduto')
+  var formCadastrarProduto = document.querySelector('.formCadastrarProduto')
+
+  //busca todos os botões pela classe
+  var x = document.getElementsByClassName('btnEditarProduto')
+
+  //Laço para buscar o ID de cada botão
+  for (i = 0; i < x.length; i++) {
+    var btn = x[i].id
+    atribuirEvento(btn)
+  }
+
+  //Função para atribuir o evento de click em todos os botões
+  function atribuirEvento(id) {
+    document.getElementById(id).addEventListener('click', e => {
+      formEditarProduto.style.display = 'block'
+      formCadastrarProduto.style.display = 'none'
+    })
+  }
+
+  //Atribuir o evento de click no botão cancelar do form editarProduto
+  document.getElementById('btnCancelar').addEventListener('click', e => {
+    formEditarProduto.style.display = 'none'
+    formCadastrarProduto.style.display = 'block'
+  })
+  */
+</script>
