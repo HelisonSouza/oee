@@ -1,4 +1,4 @@
-const { Router } = require('express')
+//const { Router } = require('express')
 const express = require('express')
 const routes = express.Router()
 
@@ -8,7 +8,6 @@ routes.post('/produtos/criar', ProdutoController.criar)
 routes.get('/produtos', ProdutoController.listar)
 routes.get('/produtos/editar/:id', ProdutoController.formEdit)
 routes.post('/produtos/editar/:id', ProdutoController.editar)
-
-
+routes.get('/produtos/desativar/:id', ProdutoController.desativar)
 
 module.exports = routes;

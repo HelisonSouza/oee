@@ -1,11 +1,13 @@
 const Produto = require('../models/Produto');
 const Validacoes = require('../validators/validacoes')
-
-//Inicializa as validações
 const validar = new Validacoes()
 
 module.exports = {
-
+  /*
+  --------------------------------------------------------------------------------------------------------------------------
+  CADASTRAR UM NOVO PRODUTO
+  --------------------------------------------------------------------------------------------------------------------------
+  */
   async criar(req, res) {
 
     //pega os dados do corpo da requisição -> 
@@ -46,26 +48,142 @@ module.exports = {
     }
   },
 
+  /*
+  --------------------------------------------------------------------------------------------------------------------------
+  LISTAR PRODUTOS ATIVOS
+  --------------------------------------------------------------------------------------------------------------------------
+  */
   async listar(req, res) {
-    const produtos = await Produto.findAll()
+    const produtos = await Produto.findAll({ where: { ativo: true } })
     return res.render('produtos/produtos', { produtos: produtos })
   },
+
+  /*
+  --------------------------------------------------------------------------------------------------------------------------
+  RENDERIZA FORMULÁRIO DE EDIÇÃO
+  --------------------------------------------------------------------------------------------------------------------------
+  */
   async formEdit(req, res) {
-    const { nome, descricao, velocidade } = req.body
+    //pega o id
     const id = req.params.id
     // validações 
-
-    //busca dados do produto pelo id
-    const dados = await Produto.findOne({ where: { id: id } })
-    //console.log(produto)
-    return res.render('produtos/editar', { produto: dados })
+    validar.isRequired(id, 'Produto inválido ')
+    // Se os dados forem inválidos, retorna com a mensagem do erro
+    if (!validar.isValid()) {
+      const erros = validar.errors()
+      erros.forEach((value) => {
+        console.log(value.message)
+        req.flash('msgErro', `${value.message}`)
+      })
+      res.redirect('/produtos')
+    } else {
+      // Passou nas validações
+      try {
+        //busca dados do produto pelo id
+        const dados = await Produto.findOne({ where: { id: id } })
+        if (!dados) {
+          req.flash('msgErro', 'Produto não existe')
+          res.redirect('/produtos')
+        } else {
+          res.render('produtos/editar', { produto: dados })
+        }
+      } catch {
+        req.flash('msgErro', 'Falha no processamento da requisição')
+        res.redirect('/produtos')
+      }
+    }
   },
 
+  /*
+  --------------------------------------------------------------------------------------------------------------------------
+  EDITAR UM PRODUTO
+  --------------------------------------------------------------------------------------------------------------------------
+  */
   async editar(req, res) {
+    //pega os dados
     const id = req.params.id
-    const { nome, descricao, velocidade } = req.body
-    //console.log(id, descricao, nome, velocidade)
-    const produto = await Produto.update({ nome, descricao, velocidade }, { where: { id: id } })
-    return res.redirect('/produtos')
+    const { nome, descricao } = req.body
+    //passando velocidade para float    
+    const velocidade = parseFloat(req.body.velocidade)
+    console.log(velocidade)
+    console.log(typeof velocidade)
+    if (velocidade == 'NaN') {
+      req.flash('msgErro', 'O valor do campo velocidade deve ser um número, tente novamente')
+      res.redirect('/produtos')
+    }
+    // validações 
+    validar.isRequired(id, 'Produto inválido ')
+    validar.isRequired(nome, 'Nome inválido ')
+    validar.hasMinLen(nome, 2, 'Nome muito curto ')
+    // Se os dados forem inválidos, retorna com a mensagem do erro
+    if (!validar.isValid()) {
+      const erros = validar.errors()
+      erros.forEach((value) => {
+        console.log(value.message)
+        req.flash('msgErro', `${value.message}`)
+      })
+      res.redirect('/produtos')
+    } else {
+      // Passou nas validações
+      try {
+        //busca dados do produto pelo id
+        const dados = await Produto.findOne({ where: { id: id } })
+        if (!dados) {
+          req.flash('msgErro', 'Produto não existe')
+          res.redirect('/produtos')
+        } else {
+          //edita o produto
+          const produto = await Produto.update({
+            nome,
+            descricao,
+            velocidade
+          }, { where: { id: id } })
+          req.flash('msgSucesso', 'Produto editado com sucesso')
+          res.redirect('/produtos')
+        }
+      } catch {
+        req.flash('msgErro', 'Falha no processamento da requisição')
+        res.redirect('/produtos')
+      }
+    }
+  },
+
+  /*
+  --------------------------------------------------------------------------------------------------------------------------
+  DESATIVAR UM PRODUTO
+  --------------------------------------------------------------------------------------------------------------------------
+  */
+  async desativar(req, res) {
+    const id = req.params.id
+    // validações 
+    validar.isRequired(id, 'Produto inválido ')
+    // Se os dados forem inválidos, retorna com a mensagem do erro
+    if (!validar.isValid()) {
+      const erros = validar.errors()
+      erros.forEach((value) => {
+        console.log(value.message)
+        req.flash('msgErro', `${value.message}`)
+      })
+      res.redirect('/produtos')
+
+    } else {
+      // Passou nas validações
+      try {
+        //busca dados do produto pelo id
+        const dados = await Produto.findOne({ where: { id: id } })
+        if (!dados) {
+          req.flash('msgErro', 'Produto não existe')
+          res.redirect('/produtos')
+        } else {
+          const produto = await Produto.update({ ativo: false }, { where: { id: id } })
+          req.flash('msgSucesso', 'O produto foi desativado')
+          res.redirect('/produtos')
+        }
+
+      } catch {
+        req.flash('msgErro', 'Falha no processamento da requisição')
+        res.redirect('/produtos')
+      }
+    }
   }
 } 

@@ -46,3 +46,11 @@ Sequelize.DATE.prototype._stringify = function _stringify(date, options) {
 
 video aulas 
 https://www.youtube.com/watch?v=FwWGLgT-_jg
+
+Referências documentação Sequelize
+https://sequelize.readthedocs.io/en/latest/docs/migrations/
+
+
+14 10 2020
+  - criado migrate para add campo 'ativo' na tabela produto
+  

@@ -6,6 +6,7 @@ class Produto extends Model {
       nome: DataTypes.STRING,
       descricao: DataTypes.STRING,
       velocidade: DataTypes.FLOAT,
+      ativo: DataTypes.BOOLEAN,
     }, {
       sequelize
     })

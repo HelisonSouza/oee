@@ -1,0 +1,83 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Data</th>
+            <th scope="col">Inicio</th>
+            <th scope="col">Lote</th>
+            <th scope="col">Produto</th>
+            <th scope="col">Planejado</th>
+            <th scope="col">Produzido</th>
+            <th scope="col">Defeito</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each producao}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{data}}</td>
+            <td>{{inicio}}</td>
+            <td>{{lote}}</td>
+            <td>{{produto_id}}</td>
+            <td>{{qtd_planejada}}</td>
+            <td>{{qtd_produzida}}</td>
+            <td>{{qtd_defeito}}</td>
+
+            <td style='width: 40px'>
+              <a href="/producao/editar/{{id}}">
+                <button type="button" class="btn btn-light">
+                  <img src="/bootstrap/icons/pencil-square.svg" alt="editar" width="24" height="24" title="editar">
+                </button>
+              </a>
+            </td>
+          </tr>
+          {{else}}
+          <tr>
+            <th scope="row">-</th>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-4 ">
+      <!-- Formulário de cadastro-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
+        <h4>Cadastro de Produção:</h4>
+        <form class="m-2" action="/producao/cadastrar" method="POST">
+          <div class="form-group">
+            <label for="data">Data</label>
+            <input type="text" class="form-control" id="data" name="data" placeholder="Data da produção">
+          </div>
+          <div class="form-group">
+            <label for="inicio">Horário de Inicio</label>
+            <input type="text" class="form-control" id="inicio" name="inicio" placeholder="00:00">
+          </div>
+          <div class="form-group">
+            <label for="lote">Lote</label>
+            <input type="text" class="form-control" id="lote" name="lote" placeholder="Lote da produção">
+          </div>
+          <div class="form-group">
+            <label for="produto_id">Produto</label>
+            <input type="text" class="form-control" id="produto" name="produto_id" placeholder="Selecione o produto">
+          </div>
+          <div class="form-group">
+            <label for="qtd_planejada">Quantidade</label>
+            <input type="text" class="form-control" id="qtd_planejada" name="qtd_planejada" placeholder="Quantidade">
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="reset" class="btn btn-secondary">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
