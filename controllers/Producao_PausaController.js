@@ -24,9 +24,6 @@ module.exports = {
     const parada = await Producao_Pausa.create({
       pausa_id,
       producao_id,
-      nome,
-      inicio,
-      fim,
     })
 
     return res.json(parada)

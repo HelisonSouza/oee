@@ -8,6 +8,7 @@ const flash = require('connect-flash')
 const path = require('path');
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
+const datefns = require('date-fns')
 // Rotas
 const usuario = require('./routes/usuario')
 const motivo = require('./routes/motivo')

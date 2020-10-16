@@ -6,6 +6,7 @@ class Pausa extends Model {
       nome: DataTypes.STRING,
       inicio: DataTypes.TIME,
       fim: DataTypes.TIME,
+      ativo: DataTypes.BOOLEAN
     }, {
       sequelize
     })

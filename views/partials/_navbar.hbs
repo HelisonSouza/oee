@@ -1,17 +1,34 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">
-    <img src="/img/producao128px.png" width="30" height="30" alt="">
-  </a>
+  <div class="mx-auto align-text-top">
+    <a class="" href="/">
+      <img src="/img/producao128px.png" class="my-2" width="40" height="40" alt="Logo">
+    </a>
+  </div>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSite">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="collapse navbar-collapse" id="navbarSite">
+  <div class="collapse navbar-collapse my-4" id="navbarSite">
     <ul class="navbar-nav m-auto">
-      <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-      <a class="nav-item nav-link" href="/producoes">Produção</a>
-      <a class="nav-item nav-link" href="/produtos">Produtos</a>
-      <a class="nav-item nav-link" href="#">Operação</a>
-      <a class="nav-item nav-link" href="#">Adm</a>
+      <li class="nav-item">
+        <a class="nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown ml-4">
+        <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          PCP
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item my-2" href="/producoes">Produção</a>
+          <a class="dropdown-item my-2" href="/produtos">Produtos</a>
+          <a class="dropdown-item my-2" href="/pausas">Pausas</a>
+        </div>
+      </li>
+      <li class="nav-item ml-4">
+        <a class="nav-link active " href="#">Operação</a>
+      </li>
+      <li class="nav-item ml-4">
+        <a class="nav-link active" href="#">Adm</a>
+      </li>
     </ul>
   </div>
 </nav>

@@ -1,4 +1,5 @@
 const Producao = require('../models/Producao');
+const Pausa = require('../models/Pausa');
 const Validacoes = require('../validators/validacoes')
 const validar = new Validacoes()
 
@@ -68,6 +69,42 @@ module.exports = {
           res.redirect('/producoes')
         } else {
           res.render('producao/editar', { producao: dados })
+        }
+      } catch {
+        req.flash('msgErro', 'Falha no processamento da requisição')
+        res.redirect('/producoes')
+      }
+    }
+  },
+  /*
+--------------------------------------------------------------------------------------------------------------------------
+RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
+--------------------------------------------------------------------------------------------------------------------------
+*/
+  async atribuir(req, res) {
+    //pega o id
+    const id = req.params.id
+    // validações 
+    validar.isRequired(id, 'Produção inválida ')
+    // Se os dados forem inválidos, retorna com a mensagem do erro
+    if (!validar.isValid()) {
+      const erros = validar.errors()
+      erros.forEach((value) => {
+        console.log(value.message)
+        req.flash('msgErro', `${value.message}`)
+      })
+      res.redirect('/producoes')
+    } else {
+      // Passou nas validações
+      try {
+        //busca dados pelo id
+        const dados = await Producao.findOne({ where: { id: id } })
+        if (!dados) {
+          req.flash('msgErro', 'Produção não existe')
+          res.redirect('/producoes')
+        } else {
+          const pausas = await Pausa.findAll({ where: { ativo: true } })
+          res.render('producao/atribuir', { producao: dados, pausas: pausas })
         }
       } catch {
         req.flash('msgErro', 'Falha no processamento da requisição')

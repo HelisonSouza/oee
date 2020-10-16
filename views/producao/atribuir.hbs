@@ -1,0 +1,48 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Data</th>
+            <th scope="col">Inicio</th>
+            <th scope="col">Lote</th>
+            <th scope="col">Produto</th>
+            <th scope="col">Planejado</th>
+            <th scope="col">Produzido</th>
+            <th scope="col">Defeito</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{producao.id}}</th>
+            <td>{{producao.data}}</td>
+            <td>{{producao.inicio}}</td>
+            <td>{{producao.lote}}</td>
+            <td>{{producao.produto}}</td>
+            <td>{{producao.qtd_planejada}}</td>
+            <td>{{producao.qtd_produzida}}</td>
+            <td>{{producao.qtd_defeito}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-4 ">
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
+        <h4>Atribuir pausas a produção:</h4>
+        {{#each pausas}}
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">{{nome}}</h5>
+            <p class="card-text">das {{inicio}} a {{fim}}</p>
+            <a href="./{{id}}" class="btn btn-primary">Atribuir</a>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

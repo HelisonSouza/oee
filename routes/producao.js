@@ -7,5 +7,6 @@ const ProducaoController = require('../controllers/ProducaoController');
 routes.post('/producao/cadastrar', ProducaoController.criar)
 routes.get('/producoes', ProducaoController.listar)
 routes.get('/producao/editar/:id', ProducaoController.formEdit)
+routes.get('/producao/atribuir_pausas/:id', ProducaoController.atribuir)
 
 module.exports = routes;
