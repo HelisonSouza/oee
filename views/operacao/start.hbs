@@ -1,0 +1,166 @@
+<div class="container bg-light">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="card p-2 m-2 shadow">
+            <div class="card-body text-center">
+              <h4 class="card-title">Produzido</h4>
+              <h1 class="text-primary font-weight-bold d-inline">110</h1>
+              <p class="d-inline ml-2"> und</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card p-2 m-2 shadow">
+            <div class="card-body text-center">
+              <h4 class="card-title">Falta</h4>
+              <h1 class="text-primary font-weight-bold d-inline">27</h1>
+              <p class="d-inline ml-2"> und</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card p-2 m-2 shadow">
+            <div class="card-body text-center">
+              <h4 class="card-title">Velocidade Média</h4>
+              <h1 class="text-primary font-weight-bold d-inline">14</h1>
+              <p class="d-inline ml-2">/min</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card p-2 m-2 shadow">
+            <div class="card-body text-center">
+              <h4 class="card-title">Previsão de enceramento em </h4>
+              <h1 class="text-primary font-weight-bold d-inline">00:33</h1>
+              <p class="d-inline ml-2"> min</p>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="m-auto">
+        <h4 class="">Planejado </h4>
+        <p class="d-inline">Produto: </p>
+        <p class="d-inline ml-2">Nome do produto </p>
+        <br>
+        <p class="d-inline">Quantidade: </p>
+        <p class="d-inline">220</p>
+        <p class="d-inline">unidades </p>
+        <br>
+        <p class="d-inline">Lote: </p>
+        <p class="d-inline">2112 </p>
+        <br>
+        <p class="d-inline">Meta: </p>
+        <p class="d-inline">15 </p>
+        <p class="d-inline">und/min</p>
+        <br>
+        <p class="d-inline">Inicio: </p>
+        <p class="d-inline">20/10/2020 06:00 </p>
+        <br>
+        <p class="d-inline">Finalização esperada: </p>
+        <p class="d-inline">20/10/2020 13:30 </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-sm-12">
+      <div class="card m-auto  shadow">
+        <div class="card-body">
+          <div id="chart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var options = {
+    series: [
+      // Produzindo
+      {
+        name: 'Produzindo',
+        data: [
+          {
+            x: 'Produção',
+            y: [
+              new Date(2010, 1, 1).getTime(),
+              new Date(2015, 1, 1).getTime()
+            ]
+          },
+        ]
+      },
+      // Pausa
+      {
+        name: 'Pausa',
+        data: [
+          {
+            x: 'Produção',
+            y: [
+              new Date(2015, 1, 2).getTime(),
+              new Date(2018, 1, 1).getTime()
+            ]
+          },
+        ]
+      },
+      // Parada
+      {
+        name: 'Parada',
+        data: [
+          {
+            x: 'Produção',
+            y: [
+              new Date(2018, 1, 2).getTime(),
+              new Date(2020, 1, 1).getTime()
+            ]
+          },
+        ]
+      },
+
+    ],
+    chart: {
+      height: 150,
+      type: 'rangeBar',
+      toolbar: { tools: { download: false } }
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        barHeight: '50%',
+        rangeBarGroupRows: true
+      }
+    },
+    colors: [
+      "#008FFB", "#00E396", "#ff0000"
+    ],
+    fill: {
+      type: 'solid'
+    },
+    xaxis: {
+      type: 'datetime'
+    },
+    legend: {
+      position: 'right'
+    },
+    tooltip: {
+      custom: function (opts) {
+        const fromYear = new Date(opts.y1).getFullYear()
+        const toYear = new Date(opts.y2).getFullYear()
+        const values = opts.ctx.rangeBar.getTooltipValues(opts)
+
+        return (
+          ''
+        )
+      }
+    }
+  };
+
+  var chart = new ApexCharts(document.querySelector("#chart"), options);
+  chart.render();
+</script>

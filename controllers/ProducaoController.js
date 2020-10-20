@@ -1,5 +1,6 @@
 const Producao = require('../models/Producao');
 const Pausa = require('../models/Pausa');
+const datefns = require('date-fns');
 const Validacoes = require('../validators/validacoes')
 const validar = new Validacoes()
 
@@ -13,10 +14,14 @@ module.exports = {
     const {
       qtd_planejada,
       lote,
-      data,
-      inicio,
       produto_id
     } = req.body
+    const data_recebida = req.body.data
+    const inicio_recebido = req.body.inicio
+
+    const data_formatada = datefns.format(data_recebida, 'MM-dd-yyyy')
+    const inicio_formatado = datefns.format(inicio_recebido, 'hh:mm')
+    console.log(data_formatada, inicio_formatado)
 
     const producao = await Producao.create({
       qtd_planejada,
@@ -38,6 +43,7 @@ module.exports = {
   */
   async listar(req, res) {
     const producoes = await Producao.findAll()
+    console
     return res.render('producao/producao', { producao: producoes })
   },
 

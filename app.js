@@ -16,6 +16,7 @@ const parada = require('./routes/parada')
 const pausa = require('./routes/pausa')
 const produto = require('./routes/produto')
 const producao = require('./routes/producao')
+const operacao = require('./routes/operacao')
 const index = require('./routes/index')
 
 require('./database/index')
@@ -49,6 +50,7 @@ app.use(parada)
 app.use(pausa)
 app.use(produto)
 app.use(producao)
+app.use(operacao)
 app.use('/', index)
 
 //Log

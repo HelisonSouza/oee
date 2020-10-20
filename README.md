@@ -46,6 +46,7 @@ Sequelize.DATE.prototype._stringify = function _stringify(date, options) {
 
 video aulas 
 https://www.youtube.com/watch?v=FwWGLgT-_jg
+Node Cron -> https://www.youtube.com/watch?v=XmJMYAV4ZSY
 
 Referências documentação Sequelize
 https://sequelize.readthedocs.io/en/latest/docs/migrations/
