@@ -2,25 +2,33 @@
   <div class="row">
     <div class="col-sm-8">
       <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
-              <h4 class="card-title">Produzido</h4>
-              <h1 class="text-primary font-weight-bold d-inline">110</h1>
-              <p class="d-inline ml-2"> und</p>
+              <h4 class="card-title">Status</h4>
+              <h1 class="text-success font-weight-bold d-inline">Rodando</h1>
             </div>
           </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
+          <div class="card p-2 m-2 shadow">
+            <div class="card-body text-center">
+              <h4 class="card-title">Realizado</h4>
+              <h1 class="text-primary font-weight-bold d-inline">130</h1>
+              <p class="d-inline m-2">und</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Falta</h4>
-              <h1 class="text-primary font-weight-bold d-inline">27</h1>
-              <p class="d-inline ml-2"> und</p>
+              <h1 class="text-primary font-weight-bold d-inline">90</h1>
+              <p class="d-inline m-2">und</p>
             </div>
           </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Velocidade Média</h4>
@@ -29,12 +37,21 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
-              <h4 class="card-title">Previsão de enceramento em </h4>
+              <h4 class="card-title">Enceramento em </h4>
               <h1 class="text-primary font-weight-bold d-inline">00:33</h1>
               <p class="d-inline ml-2"> min</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card p-2 m-2 shadow">
+            <div class="card-body text-center">
+              <h4 class="card-title">Defeito </h4>
+              <h1 class="text-danger font-weight-bold d-inline">02</h1>
+              <p class="d-inline ml-2"> und</p>
             </div>
           </div>
         </div>
@@ -62,18 +79,84 @@
         <p class="d-inline">Inicio: </p>
         <p class="d-inline">20/10/2020 06:00 </p>
         <br>
-        <p class="d-inline">Finalização esperada: </p>
+        <p class="d-inline">Fim: </p>
         <p class="d-inline">20/10/2020 13:30 </p>
       </div>
+
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-sm-8">
+      <div class="card m-auto  shadow">
+        <div class="card-body">
+          <div id="chart"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <h4>Apontamento de motivo de parada</h4>
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Hora</th>
+            <th scope="col">Duração</th>
+            <th scope="col">Motivo da parada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>08:15</td>
+            <td>00:08:45</td>
+            <td>
+              <form action="/operacao/start/motivo/:id">
+                <div class="form-group">
+                  <select class="form-control form-control-sm" id="motivo">
+                    <option>Falha maquina 1</option>
+                    <option>Bloqueio de emergência</option>
+                    <option>Atraso operador</option>
+                  </select>
+                </div>
+              </form>
+            </td>
+          </tr>
+          <tr>
+            <td>08:15</td>
+            <td>00:08:45</td>
+            <td>Motivo</td>
+          </tr>
+
+      </table>
     </div>
   </div>
 
   <div class="row mt-4">
     <div class="col-sm-12">
-      <div class="card m-auto  shadow">
-        <div class="card-body">
-          <div id="chart"></div>
-        </div>
+      <div class="m-auto p-4 shadow">
+        <h4>Eventos identificadas</h4>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Tipo</th>
+              <th scope="col">Período</th>
+              <th scope="col">Duração</th>
+              <th scope="col">Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Parada</td>
+              <td>08:00 as 08:45</td>
+              <td>00:08:45</td>
+              <td>Bloqueio de emergência</td>
+            </tr>
+            <tr>
+              <td>Pausa</td>
+              <td>08:30 as 08:50</td>
+              <td>00:20:00</td>
+              <td>Pausa do café</td>
+            </tr>
+        </table>
       </div>
     </div>
   </div>
