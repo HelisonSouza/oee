@@ -1,5 +1,6 @@
 //Modulos
 const express = require('express');
+const http = require('http')
 const exphbs = require('express-handlebars')
 const Handlebars = require('handlebars')
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access')
@@ -70,4 +71,15 @@ app.set('views', 'views');
 app.use(express.static(path.resolve(__dirname, 'public')));
 
 //Serviço
-app.listen(3000); 
+const server = http.createServer(app)
+server.listen(3000);
+
+//Configurando socket.io
+const io = require('socket.io')(server)
+io.on('connection', socket => {
+
+  console.log(`Conectado: ${socket.id}`)
+
+})
+
+module.exports = io
