@@ -1,7 +1,8 @@
 const Producao = require('../models/Producao');
 const Pausa = require('../models/Pausa');
 const datefns = require('date-fns');
-const Validacoes = require('../validators/validacoes')
+const Validacoes = require('../validators/validacoes');
+const { endOfDecadeWithOptions } = require('date-fns/fp');
 const validar = new Validacoes()
 
 module.exports = {
@@ -16,18 +17,13 @@ module.exports = {
       lote,
       produto_id
     } = req.body
-    const data_recebida = req.body.data
-    const inicio_recebido = req.body.inicio
-
-    const data_formatada = datefns.format(data_recebida, 'MM-dd-yyyy')
-    const inicio_formatado = datefns.format(inicio_recebido, 'hh:mm')
-    console.log(data_formatada, inicio_formatado)
+    const dataCompleta = req.body.data + ' ' + req.body.inicio
+    const data = new Date(dataCompleta)
 
     const producao = await Producao.create({
       qtd_planejada,
       lote,
       data,
-      inicio,
       qtd_produzida: 0,
       qtd_defeito: 0,
       usuario_id: 1,
@@ -42,9 +38,25 @@ module.exports = {
   --------------------------------------------------------------------------------------------------------------------------
   */
   async listar(req, res) {
-    const producoes = await Producao.findAll()
-    console
-    return res.render('producao/producao', { producao: producoes })
+    const producoes = await Producao.findAll().then((dados) => {
+      var retorno = []
+      dados.forEach((valor, index) => {
+        const newDate = datefns.format(valor.data, "dd-MM-yyyy' 'HH:mm")
+
+        retorno[index] = {
+          id: valor.id,
+          qtd_planejada: valor.qtd_planejada,
+          lote: valor.lote,
+          data: newDate,
+          qtd_produzida: valor.qtd_produzida,
+          qtd_defeito: valor.qtd_defeito,
+          usuario_id: valor.usuario_id,
+          produto_id: valor.produto_id
+        }
+      })
+      res.render('producao/producao', { producao: retorno })
+    })
+
   },
 
   /*

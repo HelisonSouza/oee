@@ -4,16 +4,17 @@ const { sequelize } = require('../models/Producao');
 
 module.exports = {
   async busca(req, res) {
-    //const inicios = await Producao.findAll({attributes: ['data']})
-    /*const inicios = await Producao.findAll({
+    //buscar as ultimas produções 
+
+    const inicios = await Producao.findAll({
       where: {
-        data: { $eq: new Date() },
+        data: { $gte: Date.now() },
       },
       limit: 1,
     })
-    */
-    return res.render('operacao/operacao')
-
+    console.log(inicios)
+    return res.json(inicios)
+    //return res.render('operacao/operacao')
 
     /*const datas = inicios.map(valor => {
       const corrigido = datefns.format(valor.data, 'dd-MM-yyyy')

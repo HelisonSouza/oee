@@ -6,7 +6,6 @@ class Producao extends Model {
       qtd_planejada: DataTypes.INTEGER,
       lote: DataTypes.STRING,
       data: DataTypes.DATE,
-      inicio: DataTypes.TIME,
       qtd_produzida: DataTypes.INTEGER,
       qtd_defeito: DataTypes.INTEGER,
     }, {

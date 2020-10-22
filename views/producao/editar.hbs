@@ -6,8 +6,7 @@
         <thead>
           <tr>
             <th scope="col">id</th>
-            <th scope="col">Data</th>
-            <th scope="col">Inicio</th>
+            <th scope="col">Data de Inicio</th>
             <th scope="col">Lote</th>
             <th scope="col">Produto</th>
             <th scope="col">Planejado</th>
@@ -19,7 +18,6 @@
           <tr>
             <th scope="row">{{producao.id}}</th>
             <td>{{producao.data}}</td>
-            <td>{{producao.inicio}}</td>
             <td>{{producao.lote}}</td>
             <td>{{producao.produto}}</td>
             <td>{{producao.qtd_planejada}}</td>
@@ -36,12 +34,8 @@
         <h4>Editar Produção:</h4>
         <form class="m-2" action="/producao/editar/{{producao.id}}" method="POST">
           <div class="form-group">
-            <label for="data">Data</label>
+            <label for="data">Data de Hora</label>
             <input type="text" class="form-control" id="data" name="data" value="{{producao.data}}">
-          </div>
-          <div class="form-group">
-            <label for="inicio">Horário de Inicio</label>
-            <input type="text" class="form-control" id="inicio" name="inicio" value="{{producao.inicio}}">
           </div>
           <div class="form-group">
             <label for="lote">Lote</label>

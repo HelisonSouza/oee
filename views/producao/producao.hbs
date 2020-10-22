@@ -6,8 +6,7 @@
         <thead>
           <tr>
             <th scope="col">id</th>
-            <th scope="col">Data</th>
-            <th scope="col">Inicio</th>
+            <th scope="col">Data de Inicio</th>
             <th scope="col">Lote</th>
             <th scope="col">Produto</th>
             <th scope="col">Planejado</th>
@@ -20,7 +19,6 @@
           <tr>
             <th scope="row">{{id}}</th>
             <td>{{data}}</td>
-            <td>{{inicio}}</td>
             <td>{{lote}}</td>
             <td>{{produto_id}}</td>
             <td>{{qtd_planejada}}</td>
@@ -62,11 +60,11 @@
         <form class="m-2" action="/producao/cadastrar" method="POST">
           <div class="form-group">
             <label for="data">Data</label>
-            <input type="text" class="form-control" id="data" name="data" placeholder="Data da produção">
+            <input type="date" class="form-control" id="data" name="data">
           </div>
           <div class="form-group">
             <label for="inicio">Horário de Inicio</label>
-            <input type="text" class="form-control" id="inicio" name="inicio" placeholder="00:00">
+            <input type="time" class="form-control" id="inicio" name="inicio" placeholder="00:00">
           </div>
           <div class="form-group">
             <label for="lote">Lote</label>
