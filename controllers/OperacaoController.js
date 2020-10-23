@@ -1,20 +1,21 @@
 const Producao = require('../models/Producao');
 const datefns = require('date-fns');
-const { sequelize } = require('../models/Producao');
+const { Op } = require('sequelize');
 
 module.exports = {
   async busca(req, res) {
     //buscar as ultimas produções 
 
-    const inicios = await Producao.findAll({
+    const dados = await Producao.findAll({
       where: {
-        data: { $gte: Date.now() },
-      },
-      limit: 1,
+        data: {
+          [Op.gte]: new Date()
+        }
+      }
+
     })
-    console.log(inicios)
-    return res.json(inicios)
-    //return res.render('operacao/operacao')
+
+    res.render('operacao/operacao', { operacao: dados })
 
     /*const datas = inicios.map(valor => {
       const corrigido = datefns.format(valor.data, 'dd-MM-yyyy')

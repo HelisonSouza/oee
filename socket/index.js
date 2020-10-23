@@ -1,9 +1,17 @@
 //Configurando socket.io
-/*const io = require('socket.io')(server)
 
-io.on('connection', socket => {
+/*
+const io = require('socket.io')(server)
 
-  console.log(`Conectado: ${socket.id}`)
+socket.prototype.teste = () => {
 
-})
+  io.on('connection', socket => {
+
+    console.log(`Conectado: ${socket.id}`)
+
+  })
+}
+
+module.exports = socket
+
 */

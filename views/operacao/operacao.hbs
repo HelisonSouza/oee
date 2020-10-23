@@ -12,35 +12,17 @@
           </tr>
         </thead>
         <tbody>
+          {{#each operacao}}
           <tr>
-            <td>120</td>
-            <td>Nome do Produto</td>
+            <td>{{qtd_planejada}}</td>
+            <td>{{produto_id}}</td>
             <td>
-              <button class="btn btn-primary">10 minutos</button>
+              <button class="btn btn-primary">{{data}}</button>
             </td>
           </tr>
-          <tr>
-            <td>280</td>
-            <td>Nome do Produto</td>
-            <td>
-              <button class="btn btn-primary">1 hora</button>
-            </td>
-          </tr>
-          <tr>
-            <td>670</td>
-            <td>Nome do Produto</td>
-            <td>
-              <button class="btn btn-primary">8 horas</button>
-            </td>
-          </tr>
+          {{/each}}
         </tbody>
       </table>
-
     </div>
-
-    <div class="col-sm-4 ">
-
-    </div>
-
   </div>
 </div>
