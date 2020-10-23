@@ -74,12 +74,14 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 const server = http.createServer(app)
 server.listen(3000);
 
+
 //Configurando socket.io
+
 const io = require('socket.io')(server)
 io.on('connection', socket => {
-
   console.log(`Conectado: ${socket.id}`)
+  socket.on('evento', (dados) => {
+    console.log(dados)
+  })
 
 })
-
-module.exports = io
