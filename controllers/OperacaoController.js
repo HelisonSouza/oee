@@ -5,7 +5,6 @@ const { Op } = require('sequelize');
 module.exports = {
   async busca(req, res) {
     //buscar as ultimas produções 
-
     const dados = await Producao.findAll({
       where: {
         data: {
@@ -14,8 +13,19 @@ module.exports = {
       }
 
     })
+    //grava em uma sessão 
+    req.session.sessProducoes = dados
+    //com os dados da sessão -> função para contagem regressiva = 0
 
-    res.render('operacao/operacao', { operacao: dados })
+    //passar os dados da contagem zerada para o dashboard
+
+    //res.render('operacao/operacao', { operacao: dados })
+
+    if (req.session.sessProducoes) {
+      const producao = req.session.sessProducoes
+    }
+
+    res.render('operacao/operacao', { operacao: producao })
 
     /*const datas = inicios.map(valor => {
       const corrigido = datefns.format(valor.data, 'dd-MM-yyyy')
@@ -27,4 +37,5 @@ module.exports = {
   async start(req, res) {
     return res.render('operacao/start')
   }
+
 }

@@ -21,16 +21,17 @@ const operacao = require('./routes/operacao')
 const index = require('./routes/index')
 
 require('./database/index')
+
 const app = express();
 
 // Midlewares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 
-//Sessão
+//Configuração da Sessão
 const sess = {
   secret: 'definir o segreeeedo',
-  cookie: {},
+  cookie: { maxAge: 1000 * 10 },
   resave: true,
   saveUninitialized: true
 }
@@ -70,9 +71,15 @@ app.set('views', 'views');
 //Arquivos estáticos
 app.use(express.static(path.resolve(__dirname, 'public')));
 
+//Eventos de produção
+const modelProducao = require('./models/Producao');
+const producoes = modelProducao.findAll().then((dados) => {
+  //console.log(dados)
+})
+
 //Serviço
 const server = http.createServer(app)
-server.listen(3000);
+server.listen(3000)
 
 
 //Configurando socket.io
@@ -83,5 +90,9 @@ io.on('connection', socket => {
   socket.on('evento', (dados) => {
     console.log(dados)
   })
+
+  //função do cronometro do inicio da produção
+
+  //renderizar na view 
 
 })
