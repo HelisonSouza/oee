@@ -21,6 +21,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      tipo: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaltValue: 'Operador'
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

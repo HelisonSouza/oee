@@ -1,0 +1,61 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Email</th>
+            <th scope="col">Tipo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{usuario.id}}</th>
+            <td>{{usuario.nome}}</td>
+            <td>{{usuario.email}}</td>
+            <td>{{usuario.tipo}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-4 ">
+      <!-- Formulário de Edição-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded ">
+        <h4>Editar Usuario:</h4>
+        <form class="m-2" action="/usuarios/editar/{{usuario.id}}" method="POST">
+          <div class="form-group">
+            <label for="nome" id="nome">Nome</label>
+            <input type="text" class="form-control" id="nome" name="nome" value="{{usuario.nome}}">
+          </div>
+          <div class="form-group">
+            <label for="email" id="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{usuario.email}}">
+          </div>
+          <div class="form-group">
+            <label for="senha" id="senha">Senha</label>
+            <input type="senha" class="form-control" id="senha" name="senha" placeholder="Defina uma nova senha">
+          </div>
+          <div class="form-group">
+            <label for="tipo">Tipo de permissão</label>
+            <select name="tipo" class="form-control" id="formSelectTipo">
+              <option value="Operador">Operador</option>
+              <option value="PCP">PCP</option>
+              <option value="Administrador">Administrador</option>
+              <option value="Gestor">Gestor</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="/usuarios">
+              <button type="button" class="btn btn-secondary">Cancelar</button>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
