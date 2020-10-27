@@ -34,7 +34,7 @@ module.exports = {
 
       //Usuário com email cadastrado
       const usuario = await Usuario.findOne({ where: { email: email } })
-      console.log('--------------usuário ' + usuario)
+
       if (!usuario) {
         req.flash('msgErro', 'Dados inválidos EMAIL!')
         res.redirect('/login')
@@ -56,7 +56,8 @@ module.exports = {
         //res.send({ token })
 
         //retorna para home
-        res.render('home/index', { token })
+        req.session.token = { 'token': token }
+        res.render('home/index', { token: token })
       }
     } catch (error) {
       req.flash('msgErro', 'Dados inválidos' + error)

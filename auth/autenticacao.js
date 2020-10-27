@@ -4,18 +4,22 @@ const configAutenticacao = require('../config/chave.json')
 //middleware para verificar se a autenticação está válida
 module.exports = (req, res, next) => {
     //pega o header de autorização da requisição 
-    const authHeader = req.header.authorization
+    //const authHeader = req.headers['authorization']
+    console.log(req.session)
+    const token = req.session.token.token
+    console.log(token)
+    //console.log(req.headers)
 
     //verifica se o token foi informado
-    if (!authHeader) {
+    if (!token) {
         req.flash('msgErro', 'Token de autorização não informado')
         res.redirect('/')
     }
 
+    /*
     //Executa verificações leves para ver se o token está no formato esperado ( "Bearer" + hash)
     //1° separa as partes do token para verificar
     const partes = authHeader.split(' ');
-
     //2° verifica se realmente o token tem duas partes, se não tiver retorna uma msg de erro
     if (!partes.length === 2) {
         req.flash('msgErro', 'Token de autorização com formado inválido')
@@ -30,16 +34,18 @@ module.exports = (req, res, next) => {
         req.flash('msgErro', 'Token de autorização com formato inválido')
         res.redirect('/')
     }
-
+*/
     //verificação pesada do token
     const payload = jwt.verify(token, configAutenticacao.segredo, (err, decoded) => {
         if (err) {
             req.flash('msgErro', 'Precisa de autorização')
-            res.redirect('/')
+            res.redirect('/login')
         }
         //se não teve erro, inclui o Id do usuário nas próximas requisições
-        res.locals.user = payload
-        //req.userId = decoded.id; //acho que ta errado!!!
+        console.log(decoded)
+        //res.locals.usuario = decoded
+        //req.userId = decoded.id //acho que ta errado!!!
+
         return next();
     })
 
