@@ -19,6 +19,7 @@ const produto = require('./routes/produto')
 const producao = require('./routes/producao')
 const operacao = require('./routes/operacao')
 const index = require('./routes/index')
+const { agendar } = require('./socket/index')
 
 require('./database/index')
 
@@ -31,18 +32,20 @@ app.use(bodyParser.urlencoded({ extended: true }))
 //Configuração da Sessão
 const sess = {
   secret: 'definir o segreeeedo',
-  cookie: { maxAge: 1000 * 10 },
+  cookie: { maxAge: 1000 * 60 * 60 },
   resave: true,
   saveUninitialized: true
 }
 app.use(session(sess))
 app.use(flash())
+
+//Variáveis Globais
 app.use((req, res, next) => {
-  //Variáveis Globais
   res.locals.msgSucesso = req.flash('msgSucesso')
   res.locals.msgErro = req.flash('msgErro')
   next()
 })
+global.producaoRodando = {}
 
 
 // Midlewares de rotas
@@ -72,10 +75,8 @@ app.set('views', 'views');
 app.use(express.static(path.resolve(__dirname, 'public')));
 
 //Eventos de produção
-const modelProducao = require('./models/Producao');
-const producoes = modelProducao.findAll().then((dados) => {
-  //console.log(dados)
-})
+const lista = agendar()
+
 
 //Serviço
 const server = http.createServer(app)
@@ -88,7 +89,14 @@ const io = require('socket.io')(server)
 io.on('connection', socket => {
   console.log(`Conectado: ${socket.id}`)
   socket.on('evento', (dados) => {
-    console.log(dados)
+
+    if (dados === 'Produto OK') {
+      console.log('tudo é ->' + global.producaoRodando)
+      console.log('recebido ->' + global.producaoRodando['qtd_produzida'])
+
+      producaoRodando['qtd_produzida'] = producaoRodando.qtd_produzida + 1
+    }
+
   })
 
   //função do cronometro do inicio da produção

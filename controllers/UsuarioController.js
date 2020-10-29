@@ -30,13 +30,18 @@ module.exports = {
     //pegas os dados da requisição
     const { email, senha } = req.body
     try {
-      //verificações
+      //verificações de Autenticação
 
       //Usuário com email cadastrado
-      const usuario = await Usuario.findOne({ where: { email: email } })
+      const usuario = await Usuario.findOne({
+        where: {
+          email: email,
+          ativo: true
+        }
+      })
 
       if (!usuario) {
-        req.flash('msgErro', 'Dados inválidos EMAIL!')
+        req.flash('msgErro', 'Dados inválidos!')
         res.redirect('/login')
       } else if (bcrypt.compareSync(senha, usuario.senha) === false) {
         console.log('Senha não passou')
@@ -51,11 +56,8 @@ module.exports = {
             email: usuario.email,
             tipo: usuario.tipo
           }
-        }, secret.segredo, { expiresIn: '1 day' })
-        //grava o tokem no cabeçalho das requisições
-        //res.send({ token })
-
-        //retorna para home
+        }, secret.segredo, { expiresIn: '24h' })
+        //grava o tokem na sessão e retorna a home
         req.session.token = { 'token': token }
         res.render('home/index', { token: token })
       }
