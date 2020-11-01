@@ -6,7 +6,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Status</h4>
-              <h1 class="text-success font-weight-bold d-inline">Rodando</h1>
+              <h1 class="text-success font-weight-bold d-inline" id="status">Rodando</h1>
             </div>
           </div>
         </div>
@@ -14,7 +14,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Realizado</h4>
-              <h1 class="text-primary font-weight-bold d-inline">130</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="realizado">130</h1>
               <p class="d-inline m-2">und</p>
             </div>
           </div>
@@ -23,7 +23,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Falta</h4>
-              <h1 class="text-primary font-weight-bold d-inline">90</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="falta">90</h1>
               <p class="d-inline m-2">und</p>
             </div>
           </div>
@@ -32,7 +32,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Velocidade Média</h4>
-              <h1 class="text-primary font-weight-bold d-inline">14</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="velocidade">14</h1>
               <p class="d-inline ml-2">/min</p>
             </div>
           </div>
@@ -41,7 +41,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Enceramento em </h4>
-              <h1 class="text-primary font-weight-bold d-inline">00:33</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="enceraEm">00:33</h1>
               <p class="d-inline ml-2"> min</p>
             </div>
           </div>
@@ -50,7 +50,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Defeito </h4>
-              <h1 class="text-danger font-weight-bold d-inline">02</h1>
+              <h1 class="text-danger font-weight-bold d-inline" id="defeito">11</h1>
               <p class="d-inline ml-2"> und</p>
             </div>
           </div>
@@ -62,72 +62,44 @@
     <div class="col-sm-4">
       <div class="m-auto">
         <h4 class="">Planejado </h4>
+        {{#if producao}}
         <p class="d-inline">Produto: </p>
-        <p class="d-inline ml-2">Nome do produto </p>
+        <p class="d-inline ml-2" id="produto"> {{producao.id}} </p>
         <br>
         <p class="d-inline">Quantidade: </p>
-        <p class="d-inline">220</p>
+        <p class="d-inline" id="quantidade">{{producao.qtd_planejada}}</p>
         <p class="d-inline">unidades </p>
         <br>
         <p class="d-inline">Lote: </p>
-        <p class="d-inline">2112 </p>
+        <p class="d-inline">{{producao.lote}} </p>
         <br>
         <p class="d-inline">Meta: </p>
         <p class="d-inline">15 </p>
         <p class="d-inline">und/min</p>
         <br>
         <p class="d-inline">Inicio: </p>
-        <p class="d-inline">20/10/2020 06:00 </p>
+        <script>
+
+        </script>
+        <p class="d-inline" id="dataInicio">{{producao.data}}</p>
         <br>
         <p class="d-inline">Fim: </p>
         <p class="d-inline">20/10/2020 13:30 </p>
+        {{/if}}
       </div>
 
     </div>
   </div>
 
   <div class="row mt-4">
-    <div class="col-sm-8">
+    <div class="col-sm-12">
       <div class="card m-auto  shadow">
         <div class="card-body">
           <div id="chart"></div>
         </div>
       </div>
     </div>
-    <div class="col-sm-4">
-      <h4>Apontamento de motivo de parada</h4>
-      <table class="table table-sm">
-        <thead>
-          <tr>
-            <th scope="col">Hora</th>
-            <th scope="col">Duração</th>
-            <th scope="col">Motivo da parada</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>08:15</td>
-            <td>00:08:45</td>
-            <td>
-              <form action="/operacao/start/motivo/:id">
-                <div class="form-group">
-                  <select class="form-control form-control-sm" id="motivo">
-                    <option>Falha maquina 1</option>
-                    <option>Bloqueio de emergência</option>
-                    <option>Atraso operador</option>
-                  </select>
-                </div>
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td>08:15</td>
-            <td>00:08:45</td>
-            <td>Motivo</td>
-          </tr>
 
-      </table>
-    </div>
   </div>
 
   <div class="row mt-4">
@@ -163,7 +135,7 @@
 
 </div>
 
-<script>
+<script> //charts
   var options = {
     series: [
       // Produzindo
@@ -247,7 +219,27 @@
   var chart = new ApexCharts(document.querySelector("#chart"), options);
   chart.render();
 </script>
-
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 <script>
-  
+
+  //aponta pra o socket server
+  window.onload = (function () {
+
+    const socket = io('http://localhost:3000')
+
+    socket.emit('onload', 'onload')
+
+    //recebe o evento de envio dos dados da produção
+    socket.on('producaoDados', (dadosRecebidos) => {
+      //Atualiza o value dos elementos
+      document.getElementById('status').innerHTML = "Start"
+      document.getElementById('realizado').innerHTML = dadosRecebidos.qtd_produzida
+      document.getElementById('falta').innerHTML = dadosRecebidos.qtd_planejada - dadosRecebidos.qtd_produzida
+      document.getElementById('velocidade').innerHTML = 100
+      document.getElementById('enceraEm').innerHTML = "00:00"
+      document.getElementById('defeito').innerHTML = dadosRecebidos.qtd_defeito
+      console.log(dadosRecebidos)
+    })
+
+  })
 </script>

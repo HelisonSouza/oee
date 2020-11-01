@@ -1,11 +1,12 @@
 const Producao = require('../models/Producao');
 const datefns = require('date-fns');
 const { Op } = require('sequelize');
+const { io } = require('../app')
 
 module.exports = {
   async busca(req, res) {
     //buscar as ultimas produções 
-    const dados = await Producao.findAll({
+    const producao = await Producao.findAll({
       where: {
         data: {
           [Op.gte]: new Date()
@@ -14,16 +15,6 @@ module.exports = {
 
     })
     //grava em uma sessão 
-    req.session.sessProducoes = dados
-    //com os dados da sessão -> função para contagem regressiva = 0
-
-    //passar os dados da contagem zerada para o dashboard
-
-    //res.render('operacao/operacao', { operacao: dados })
-
-    if (req.session.sessProducoes) {
-      const producao = req.session.sessProducoes
-    }
 
     res.render('operacao/operacao', { operacao: producao })
 
@@ -36,6 +27,13 @@ module.exports = {
   },
   async start(req, res) {
     return res.render('operacao/start')
+  },
+  async startId(req, res) {
+    const { id } = req.params
+    const producao = await Producao.findByPk(id)
+
+    req.session.producao = producao
+    res.render('operacao/start', { producao, producao })
   }
 
 }

@@ -1,13 +1,20 @@
-var obj = {
-  nome: 'Lary',
-  idade: 25
+var { varGlobal } = require('./helpers/global')
+
+const dados = {
+  teste: 04,
+  nome: 'Hélison S'
 }
 
-function fazAniversário(data) {
-  if (data === "27/10") {
-    obj['idade'] = obj.idade + 1
-  }
-  console.log('--->' + JSON.stringify(obj))
-}
+console.log(varGlobal)
+console.log(dados)
 
-fazAniversário('27/10')
+setTimeout(() => {
+  varGlobal = dados
+  console.log(varGlobal)
+}, 2000)
+
+setTimeout(() => {
+  varGlobal.teste = varGlobal.teste + 1
+  console.log(varGlobal)
+}, 4000)
+

@@ -2,9 +2,10 @@ const CronJob = require('cron').CronJob
 const { format, formatDistance, isDate } = require('date-fns')
 const modelProducao = require('../models/Producao');
 const { Op } = require('sequelize');
+var { varGlobal } = require('../helpers/global')
 
 module.exports = {
-  agendar: async () => {
+  agendar: async (socket) => {
     //busca as produções cadastradas com data maior que agora....
     const producoes = await modelProducao.findAll({
       where: {
@@ -20,11 +21,14 @@ module.exports = {
       //console.log(id, data)
       var job = new CronJob(data, () => {
         //função que o cron vai executar...
-        global.producaoRodano = producao.dataValues
-        console.log(producaoRodano)
+        socket.broadcast.emit('agendado', producao.dataValues)
+        console.log("Agendado! ")
       })
       job.start()
-      lista.push(job)
+      lista.push({
+        producao: producao.dataValues,
+        cron: job
+      })
     })
     return lista
   }
