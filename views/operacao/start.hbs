@@ -62,16 +62,16 @@
     <div class="col-sm-4">
       <div class="m-auto">
         <h4 class="">Planejado </h4>
-        {{#if producao}}
+
         <p class="d-inline">Produto: </p>
-        <p class="d-inline ml-2" id="produto"> {{producao.id}} </p>
+        <p class="d-inline ml-2" id="produto"> </p>
         <br>
         <p class="d-inline">Quantidade: </p>
-        <p class="d-inline" id="quantidade">{{producao.qtd_planejada}}</p>
+        <p class="d-inline" id="quantidade"></p>
         <p class="d-inline">unidades </p>
         <br>
         <p class="d-inline">Lote: </p>
-        <p class="d-inline">{{producao.lote}} </p>
+        <p class="d-inline"> </p>
         <br>
         <p class="d-inline">Meta: </p>
         <p class="d-inline">15 </p>
@@ -81,11 +81,11 @@
         <script>
 
         </script>
-        <p class="d-inline" id="dataInicio">{{producao.data}}</p>
+        <p class="d-inline" id="dataInicio"></p>
         <br>
         <p class="d-inline">Fim: </p>
         <p class="d-inline">20/10/2020 13:30 </p>
-        {{/if}}
+
       </div>
 
     </div>
@@ -134,6 +134,50 @@
   </div>
 
 </div>
+
+
+
+<script src="/socket.io/socket.io.js"> </script>
+
+<script>
+
+  //aponta pra o socket server
+  var socket = io()
+
+  window.onload = () => {
+    socket.emit('onload', 'onload')
+
+  }
+
+  socket.on('connect', () => {
+    console.log(`Conectado: ${socket.id}`)
+    socket.emit('teste', socket.id)
+
+  })
+
+  //recebe o evento de envio dos dados da produção
+  socket.on('producaoDados', (dadosRecebidos) => {
+    atualizaDados(dadosRecebidos)
+    console.log(dadosRecebidos)
+  })
+
+  //recebe a carga de dados quando OnLoad
+  socket.on('cargaOnload', (dadosRecebidos) => {
+    atualizaDados(dadosRecebidos)
+    console.log('dados recebidos quando Onload' + JSON.stringify(dadosRecebidos))
+  })
+
+  atualizaDados = (dadosRecebidos => {
+    //Atualiza o value dos elementos
+    document.getElementById('status').innerHTML = "Start"
+    document.getElementById('realizado').innerHTML = dadosRecebidos.qtd_produzida
+    document.getElementById('falta').innerHTML = dadosRecebidos.qtd_planejada - dadosRecebidos.qtd_produzida
+    document.getElementById('velocidade').innerHTML = 100
+    document.getElementById('enceraEm').innerHTML = "00:00"
+    document.getElementById('defeito').innerHTML = dadosRecebidos.qtd_defeito
+  })
+
+</script>
 
 <script> //charts
   var options = {
@@ -218,28 +262,4 @@
 
   var chart = new ApexCharts(document.querySelector("#chart"), options);
   chart.render();
-</script>
-<script src="http://localhost:3000/socket.io/socket.io.js"></script>
-<script>
-
-  //aponta pra o socket server
-  window.onload = (function () {
-
-    const socket = io('http://localhost:3000')
-
-    socket.emit('onload', 'onload')
-
-    //recebe o evento de envio dos dados da produção
-    socket.on('producaoDados', (dadosRecebidos) => {
-      //Atualiza o value dos elementos
-      document.getElementById('status').innerHTML = "Start"
-      document.getElementById('realizado').innerHTML = dadosRecebidos.qtd_produzida
-      document.getElementById('falta').innerHTML = dadosRecebidos.qtd_planejada - dadosRecebidos.qtd_produzida
-      document.getElementById('velocidade').innerHTML = 100
-      document.getElementById('enceraEm').innerHTML = "00:00"
-      document.getElementById('defeito').innerHTML = dadosRecebidos.qtd_defeito
-      console.log(dadosRecebidos)
-    })
-
-  })
 </script>

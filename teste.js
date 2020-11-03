@@ -1,20 +1,22 @@
-var { varGlobal } = require('./helpers/global')
 
-const dados = {
-  teste: 04,
-  nome: 'Hélison S'
+const valorInicial = 10
+
+var results = []
+
+var result = soma = (num1) => {
+  return num1++
 }
 
-console.log(varGlobal)
-console.log(dados)
+setInterval(() => {
+  soma(valorInicial)
+  results.push(result)
+  console.log(results.length)
+}, 1000)
 
-setTimeout(() => {
-  varGlobal = dados
-  console.log(varGlobal)
-}, 2000)
+/*
 
-setTimeout(() => {
-  varGlobal.teste = varGlobal.teste + 1
-  console.log(varGlobal)
-}, 4000)
+10 + 1 = 11
+11 + 1 = 12
+12 + 1 = 13
 
+*/

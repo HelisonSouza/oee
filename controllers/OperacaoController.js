@@ -33,7 +33,7 @@ module.exports = {
     const producao = await Producao.findByPk(id)
 
     req.session.producao = producao
-    res.render('operacao/start', { producao, producao })
+    res.render('operacao/start')
   }
 
 }
