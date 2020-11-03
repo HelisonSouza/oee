@@ -83,8 +83,11 @@ server.listen(3000)
 //   Socket.io
 //---------------------------------------------------------------------------------------
 io.on('connection', socket => {
-  console.log(`Conectado: ${socket.id}`)
+  console.log(`Conectado a: ${socket.id}`)
 
+  socket.on('teste', (e) => {
+    console.log('###  teste OK  ' + e)
+  })
 
   atualizarProducacao = async (id, qtd) => {
     //Atualiza Quantidade Produzida
@@ -104,35 +107,51 @@ io.on('connection', socket => {
     socket.handshake.session.producao = dados
     socket.handshake.session.save()
     var atualizado = await socket.handshake.session.producao
-    console.log('Sessão Atualizada :' + JSON.stringify(dados))
+    //console.log('Sessão Atualizada :' + JSON.stringify(dados))
     enviaDados(atualizado)
+    enviaOnload(atualizado)
+    retornaQntProduzida(atualizado.qtd_produzida)
+    return (atualizado)
   }
+
+
 
   //envia os dados para socket da view start
   enviaDados = (atualizado) => {
-    socket.emit('producaoDados', atualizado)
-    console.log('socket enviou :' + JSON.stringify(atualizado))
+    socket.broadcast.emit('producaoDados', atualizado)
+    //console.log('socket enviou :' + JSON.stringify(atualizado))
+  }
+
+  enviaOnload = (dados) => {
+    socket.emit('cargaOnload', dados)
+    //console.log('Socket enviou a carga do onload ' + JSON.stringify(dados))
+  }
+
+  retornaQntProduzida = (valorAtual) => {
+    socket.emit('qtdProduzida', valorAtual)
   }
 
   //pega os dados da session
   var producao = socket.handshake.session.producao
 
   if (producao) {
-    //chama função para enviar os dados para view
-    //enviaDados(producao)
-    const id = socket.handshake.session.producao.id
+
+    //const id = socket.handshake.session.producao.id
+    //var qtd = socket.handshake.session.producao.qtd_produzida
+
 
     //Recebe os evendos do Server Socket-io
     socket.on('evento', (dados) => {
-      console.log('veio ->' + dados)
+      console.log('veio ->' + dados.nome + " " + dados.valor)
+      var qtd = dados.valor + 1
 
       //Evento PRODUTO OK
-      if (dados === 'Produto OK') {
-        atualizarProducacao(id, 54);
+      if (dados.nome === 'Produto OK') {
+        atualizarProducacao(3, qtd);
       }
 
-      if (dados === 'Produto com Defeito') {
-        console.log('recebido ->' + dados)
+      if (dados.nome === 'Produto com Defeito') {
+        console.log('recebido ->' + dados.nome)
       }
 
     })
