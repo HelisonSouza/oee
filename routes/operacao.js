@@ -6,5 +6,10 @@ routes.get('/operacao', OperacaoController.busca)
 routes.get('/operacao/start', OperacaoController.start)
 routes.get('/operacao/start/:id', OperacaoController.startId)
 
+routes.get('/operacao/executadas', OperacaoController.getProducoesExecutadas)
+routes.get('/paradas')
+routes.get('/motivos')
+
+
 
 module.exports = routes;

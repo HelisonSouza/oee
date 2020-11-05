@@ -27,7 +27,8 @@ module.exports = {
       qtd_produzida: 0,
       qtd_defeito: 0,
       usuario_id: 1,
-      produto_id
+      produto_id,
+      status: "planejada"
     })
 
     return res.redirect('/producoes')
@@ -51,7 +52,8 @@ module.exports = {
           qtd_produzida: valor.qtd_produzida,
           qtd_defeito: valor.qtd_defeito,
           usuario_id: valor.usuario_id,
-          produto_id: valor.produto_id
+          produto_id: valor.produto_id,
+          status: valor.status
         }
       })
       res.render('producao/producao', { producao: retorno })

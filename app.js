@@ -82,7 +82,21 @@ server.listen(3000)
 //---------------------------------------------------------------------------------------
 //   Socket.io
 //---------------------------------------------------------------------------------------
+
 io.on('connection', socket => {
+
+  //teste de conecção
+
+  socket.on('teste2', () => {
+    console.log("recebido teste 2")
+    io.emit('teste3', 'ok')
+  })
+
+  socket.on('teste3', () => {
+    console.log('ouviu teste 3')
+  })
+
+
   console.log(`Conectado a: ${socket.id}`)
 
   socket.on('teste', (e) => {
@@ -96,6 +110,16 @@ io.on('connection', socket => {
     })
     atualizaSession(await getDados(id))
   }
+
+  atualizarProducacaoDefeito = async (id, qtd) => {
+    //Atualiza Quantidade Produzida
+    await Producao.update({ qtd_defeito: qtd }, {
+      where: { id: id }
+    })
+    atualizaSession(await getDados(id))
+  }
+
+
 
   getDados = async (id) => {
     //Pega os dados atualizadados
@@ -118,8 +142,8 @@ io.on('connection', socket => {
 
   //envia os dados para socket da view start
   enviaDados = (atualizado) => {
-    socket.broadcast.emit('producaoDados', atualizado)
-    //console.log('socket enviou :' + JSON.stringify(atualizado))
+    io.emit('producaoDados', atualizado)
+    console.log('socket enviou :' + JSON.stringify(atualizado))
   }
 
   enviaOnload = (dados) => {
@@ -142,23 +166,26 @@ io.on('connection', socket => {
 
     //Recebe os evendos do Server Socket-io
     socket.on('evento', (dados) => {
-      console.log('veio ->' + dados.nome + " " + dados.valor)
-      var qtd = dados.valor + 1
+      console.log('veio ->' + dados.nome)
+      let qtd_defeito = dados.qtd_defeito + 1
+      let qtd_produzida = dados.qtd_produzida + 1
+      let id = dados.id
 
       //Evento PRODUTO OK
       if (dados.nome === 'Produto OK') {
-        atualizarProducacao(3, qtd);
+        atualizarProducacao(id, qtd_produzida);
       }
-
+      //Evento PRODUTO COM DEFEITO
       if (dados.nome === 'Produto com Defeito') {
-        console.log('recebido ->' + dados.nome)
+        atualizarProducacaoDefeito(id, qtd_defeito)
       }
 
     })
   }
 
-  socket.on('onload', () => {
-    console.log('Onload view')
+  //evento que recebe o avido de Onload dos clientes
+  socket.on('onload', (cliente) => {
+    console.log('Onload view' + cliente)
     atualizaSession(producao)
   })
 

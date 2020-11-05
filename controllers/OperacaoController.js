@@ -34,6 +34,25 @@ module.exports = {
 
     req.session.producao = producao
     res.render('operacao/start')
+  },
+  /*
+  --------------------------------------------------------------------------------------------------------------------------
+  RETORNA AS PRODUÇÕES EXECUTADAS
+  --------------------------------------------------------------------------------------------------------------------------
+  */
+  async getProducoesExecutadas(req, res) {
+    try {
+      const executadas = await Producao.findAll({
+        where: {
+          status: { [Op.eq]: 'finalizada' }
+        }
+      })
+      console.log(executadas)
+      res.render('operacao/executadas', { executadas })
+    } catch (error) {
+      req.flash('msgErro', 'Erro de processamento da requisição!' + error)
+      res.redirect('/')
+    }
   }
 
 }

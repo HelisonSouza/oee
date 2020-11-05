@@ -1,0 +1,61 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <h4>Motivos de paradas</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each motivos}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{descricao}}</td>
+            <td style='width: 40px'>
+              <a href="motivo/desativar/{{id}}">
+                <button type="button" class="btn btn-light">
+                  <img src="/bootstrap/icons/trash.svg" alt="desativar" width="24" height="24" title="desativar">
+                </button>
+              </a>
+            </td>
+            <td style='width: 40px'>
+              <a href="motivo/editar/{{id}}">
+                <button type="button" class="btn btn-light">
+                  <img src="/bootstrap/icons/pencil-square.svg" alt="editar" width="24" height="24" title="editar">
+                </button>
+              </a>
+            </td>
+          </tr>
+          {{else}}
+          <tr>
+            <th scope="row">-</th>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-4 ">
+      <!-- Formulário de cadastro-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded ">
+        <h4>Cadastrar motivo de parada:</h4>
+        <form class="m-2" action="/motivos" method="POST">
+          <div class="form-group">
+            <label for="descricao" id="nome">Descrição</label>
+            <input type="text" class="form-control" id="descricao" name="descricao" placeholder="Descrição do motivo">
+          </div>
+          <button type="submit" class="btn btn-primary">Cadastrar</button>
+          <button type="reset" class="btn btn-secondary">Cancelar</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>

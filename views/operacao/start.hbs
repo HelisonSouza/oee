@@ -145,9 +145,17 @@
   var socket = io()
 
   window.onload = () => {
-    socket.emit('onload', 'onload')
-
+    socket.emit('onload', 'onload cliente 3000')
   }
+
+  //teste de comunicação
+  socket.on('teste2', () => {
+    console.log("recebido teste 2")
+  })
+
+  socket.on('teste3', () => {
+    console.log("recebido teste 3")
+  })
 
   socket.on('connect', () => {
     console.log(`Conectado: ${socket.id}`)

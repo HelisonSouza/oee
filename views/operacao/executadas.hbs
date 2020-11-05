@@ -1,0 +1,49 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-12">
+      <h4>Produções Executadas</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Iniciada em</th>
+            <th scope="col">Finalizada em</th>
+            <th scope="col">Lote</th>
+            <th scope="col">Produto</th>
+            <th scope="col">Produzido</th>
+            <th scope="col">Defeito</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each executadas}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{data}}</td>
+            <td>{{finalizadaEm}}</td>
+            <td>{{lote}}</td>
+            <td>{{produto_id}}</td>
+            <td>{{qtd_produzida}}</td>
+            <td>{{qtd_defeito}}</td>
+
+            <td style='width: 40px'>
+              <a href="/operacao/detalhar/{{id}}">
+                <button type="button" class="btn btn-light">
+                  <img src="/bootstrap/icons/search.svg" alt="detalhar" width="24" height="24" title="detalhar">
+                </button>
+              </a>
+            </td>
+          </tr>
+          {{else}}
+          <tr>
+            <th scope="row">-</th>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
