@@ -6,19 +6,22 @@
       <table class="table">
         <thead>
           <tr>
-            <th scope="col">Quantidade</th>
+            <th scope="col">ID</th>
+            <th scope="col">Lote</th>
             <th scope="col">Produto</th>
+            <th scope="col">Quantidade</th>
             <th scope="col">Inicia em:</th>
+            <th scope="col">Start</th>
           </tr>
         </thead>
         <tbody>
           {{#each operacao}}
           <tr>
+            <td>{{id}}</td>
+            <td>{{lote}}</td>
+            <td>{{produto}}</td>
             <td>{{qtd_planejada}}</td>
-            <td>{{produto_id}}</td>
-            <td>
-              <button class="btn btn-primary">{{data}}</button>
-            </td>
+            <td>{{data}}</td>
             <td style='width: 40px'>
               <a href="operacao/start/{{id}}">
                 <button type="button" class="btn btn-light btnStart">

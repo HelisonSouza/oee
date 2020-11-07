@@ -6,6 +6,9 @@ const MotivoController = require('../controllers/MotivoController');
 
 routes.post('/motivos', MotivoController.criar)
 routes.get('/motivos', MotivoController.listar)
-routes.get('/motivos', MotivoController.editar)
+routes.post('/motivos/editar/:id', MotivoController.editar)
+routes.get('/motivo/editar/:id', MotivoController.renderEditar)
+routes.get('/motivo/desativar/:id', MotivoController.desativar)
+
 
 module.exports = routes;

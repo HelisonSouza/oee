@@ -1,8 +1,8 @@
 const Producao = require('../models/Producao');
 const Pausa = require('../models/Pausa');
 const datefns = require('date-fns');
-const Validacoes = require('../validators/validacoes');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
+const Validacoes = require('../validators/validacoes');
 const validar = new Validacoes()
 
 module.exports = {

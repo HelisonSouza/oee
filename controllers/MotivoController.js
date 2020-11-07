@@ -32,10 +32,24 @@ module.exports = {
 
   async listar(req, res) {
     try {
-      const motivos = await Motivo.findAll()
-      res.render('operacao/motivo', { motivos })
+      const motivos = await Motivo.findAll({ where: { ativo: true } })
+      res.render('motivos/motivo', { motivos })
     } catch (error) {
       req.flash('msgErro', 'Erro de processamento da requisição!' + error)
+      res.redirect('/')
+    }
+  },
+
+  async renderEditar(req, res) {
+    //pega os dados
+    const { id } = req.params
+    try {
+      let motivo = await Motivo.findByPk(id, { where: { ativo: true } })
+      //console.log(motivo)
+      res.render('motivos/editaMotivo', { motivo })
+
+    } catch (error) {
+      req.flash('msgErro', 'Erro ao editar motivo de parada!' + error)
       res.redirect('/')
     }
   },
@@ -59,7 +73,7 @@ module.exports = {
         })
         res.redirect('/motivos')
       } else {
-        //cadastra um novo motivo
+        //edita o motivo
         const motivos = await Motivo.update({ descricao: descricao }, { where: { id: id } })
         req.flash('msgSucesso', 'Dados editados com sucesso')
         return res.redirect('/motivos')
@@ -69,6 +83,19 @@ module.exports = {
       res.redirect('/')
     }
   },
+
+  async desativar(req, res) {
+    //pega os dados
+    const { id } = req.params
+    try {
+      await Motivo.update({ ativo: false }, { where: { id: id } })
+      req.flash('msgSucesso', 'Desativado com sucesso')
+      res.redirect('/motivos')
+    } catch (error) {
+      req.flash('msgErro', 'Erro ao editar motivo de parada!   ' + error)
+      res.redirect('/')
+    }
+  }
 }
 
 

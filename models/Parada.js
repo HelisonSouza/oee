@@ -5,6 +5,7 @@ class Parada extends Model {
     super.init({
       inicio: DataTypes.DATE,
       fim: DataTypes.DATE,
+      identificada: DataTypes.BOOLEAN
     }, {
       sequelize
     })

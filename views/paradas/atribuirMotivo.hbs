@@ -1,0 +1,40 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <h4>Atribuir motivo a parada</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{motivo.id}}</th>
+            <td>{{motivo.descricao}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-sm-4 ">
+      <!-- Formulário de edição-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded ">
+        <h4>Cadastrar motivo de parada:</h4>
+        <form class="m-2" action="/motivos/editar/{{motivo.id}}" method="POST">
+          <div class="form-group">
+            <label for="descricao" id="nome">Descrição</label>
+            <input type="text" class="form-control" id="descricao" name="descricao" value="{{motivo.descricao}}">
+          </div>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+          <a href="/motivos">
+            <button type="button" class="btn btn-secondary">Cancelar</button>
+          </a>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>

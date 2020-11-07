@@ -4,6 +4,7 @@ class Motivo extends Model {
   static init(sequelize) {
     super.init({
       descricao: DataTypes.STRING,
+      ativo: DataTypes.BOOLEAN,
     }, {
       sequelize
     })
