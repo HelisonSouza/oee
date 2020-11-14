@@ -68,6 +68,10 @@ video aulas
 https://www.youtube.com/watch?v=FwWGLgT-_jg
 Node Cron -> https://www.youtube.com/watch?v=XmJMYAV4ZSY
 
+Query Paramsc
+
 Referências documentação Sequelize
 https://sequelize.readthedocs.io/en/latest/docs/migrations/
+
+
 

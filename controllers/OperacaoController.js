@@ -19,7 +19,7 @@ module.exports = {
         association: 'produto',
       }
     })
-    console.log(producao)
+    //console.log(producao)
     //Trata os campos de data
     var retorno = []
     producao.forEach((valor, index) => {
@@ -72,10 +72,32 @@ module.exports = {
       const executadas = await Producao.findAll({
         where: {
           status: { [Op.eq]: 'finalizada' }
+        },
+        include: {
+          association: 'produto',
         }
       })
-      //console.log(executadas)
-      res.render('operacao/executadas', { executadas })
+      console.log(executadas)
+      //Trata os campos de data
+      var retorno = []
+      executadas.forEach((valor, index) => {
+        const inicioFormatado = datefns.formatDistanceToNow(valor.data, { locale: ptBR })
+        const fimFormatado = datefns.formatDistanceToNow(datefns.parseISO(valor.finalizadaEm), { locale: ptBR })
+
+        //let intervaloFormatado = datefns.formatDuration(intervalo, { locale: ptBR })
+
+        retorno[index] = {
+          id: valor.id,
+          data: inicioFormatado,
+          finalizadaEm: fimFormatado,
+          lote: valor.lote,
+          produto_id: valor.produto.nome,
+          qtd_produzida: valor.qtd_produzida,
+          qtd_defeito: valor.qtd_defeito
+        }
+      })
+      console.log(retorno)
+      res.render('operacao/executadas', { executadas: retorno })
     } catch (error) {
       req.flash('msgErro', 'Erro de processamento da requisição!' + error)
       res.redirect('/')

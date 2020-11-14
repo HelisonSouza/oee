@@ -40,3 +40,12 @@ a {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+.blocoPequeno{
+  height: 100px;
+  padding: 3px
+}
+.chartSm{
+  height: 100%;
+  width: 100%;
+}

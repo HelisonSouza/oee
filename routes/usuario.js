@@ -11,5 +11,6 @@ routes.post('/usuarios/editar/:id', UsuarioController.editar)
 routes.get('/usuarios/desativar/:id', UsuarioController.desativar)
 routes.get('/login', UsuarioController.renderLogin)
 routes.post('/login', UsuarioController.login)
+routes.get('/usuarios/relatorios', UsuarioController.renderRelatorios)
 
 module.exports = routes;

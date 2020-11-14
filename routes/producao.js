@@ -8,5 +8,7 @@ routes.post('/producao/cadastrar', ProducaoController.criar)
 routes.get('/producoes', ProducaoController.listar)
 routes.get('/producao/editar/:id', ProducaoController.formEdit)
 routes.get('/producao/atribuir_pausas/:id', ProducaoController.atribuir)
+routes.get('/producao/relatorios', ProducaoController.renderRelatorios)
+routes.get('/producao/relatorio', ProducaoController.relatorios)
 
 module.exports = routes;

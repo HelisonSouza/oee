@@ -10,5 +10,6 @@ routes.get('/produtos', ProdutoController.listar)
 routes.get('/produtos/editar/:id', ProdutoController.formEdit)
 routes.post('/produtos/editar/:id', ProdutoController.editar)
 routes.get('/produtos/desativar/:id', ProdutoController.desativar)
+routes.get('/produtos/relatorios', ProdutoController.renderRelatorios)
 
 module.exports = routes;

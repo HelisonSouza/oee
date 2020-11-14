@@ -1,6 +1,8 @@
 const Produto = require('../models/Produto');
 const Validacoes = require('../validators/validacoes')
 const validar = new Validacoes()
+const datefns = require('date-fns');
+const { endOfDecadeWithOptions } = require('date-fns/fp');
 
 module.exports = {
   /*
@@ -185,5 +187,38 @@ module.exports = {
         res.redirect('/produtos')
       }
     }
-  }
+  },
+  /*
+--------------------------------------------------------------------------------------------------------------------------
+RENDER VIEW RELATÓRIO DE PRODUTOS
+--------------------------------------------------------------------------------------------------------------------------
+*/
+  async renderRelatorios(req, res) {
+    try {
+      var result = []
+      const produtos = await Produto.findAll().then((dados) => {
+        dados.forEach((valor, index) => {
+          const newDate = datefns.format(valor.createdAt, "dd-MM-yyyy' 'HH:mm")
+          let status = "Ativo"
+          if (valor.ativo === false) {
+            status = "Desativado"
+          }
+          result[index] = {
+            id: valor.id,
+            nome: valor.nome,
+            descricao: valor.descricao,
+            velocidade: valor.velocidade,
+            cadastradoEm: newDate,
+            ativo: status
+          }
+        })
+      })
+      console.log(result)
+      res.render('produtos/relatorios', { produtos: result })
+    } catch (erro) {
+      req.flash('msgErro', 'Falha no processamento da requisição' + erro)
+      res.redirect('/produtos')
+    }
+  },
+
 } 

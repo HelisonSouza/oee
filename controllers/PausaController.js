@@ -1,7 +1,8 @@
 const Pausa = require('../models/Pausa');
-const format = require('date-fns/format')
 const Validacoes = require('../validators/validacoes')
 const validar = new Validacoes()
+const datefns = require('date-fns');
+const { ptBR } = require('date-fns/locale');
 
 module.exports = {
   /*
@@ -12,9 +13,13 @@ module.exports = {
   async criar(req, res) {
     const { inicio, fim, nome } = req.body
 
+    const inicioFormat = new Date(`2020-01-01 ${inicio}`)
+    const fimFormat = new Date(`2020-01-01 ${fim}`)
+
+    console.log(inicio, fim, nome, inicioFormat, fimFormat)
     const pausa = await Pausa.create({
-      inicio,
-      fim,
+      inicio: inicioFormat,
+      fim: fimFormat,
       nome,
     })
 
@@ -27,8 +32,21 @@ module.exports = {
   */
   async listar(req, res) {
     const pausas = await Pausa.findAll({ where: { ativo: true } })
-    const duracao = 10
-    return res.render('pausas/pausas', { pausas: pausas, duracao: duracao })
+    let results = []
+    pausas.forEach((valor, index) => {
+      const inicioFormat = datefns.format(valor.inicio, "HH:mm")
+      const fimFormat = datefns.format(valor.fim, "HH:mm")
+      const duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+      results[index] = {
+        id: valor.id,
+        nome: valor.nome,
+        inicio: inicioFormat,
+        fim: fimFormat,
+        duracao: duracao
+      }
+      //console.log(results)
+    })
+    return res.render('pausas/pausas', { pausas: results })
   },
   /*
   --------------------------------------------------------------------------------------------------------------------------
@@ -153,6 +171,40 @@ module.exports = {
         res.redirect('/pausas')
       }
     }
-  }
-
+  },
+  /*
+  --------------------------------------------------------------------------------------------------------------------------
+    RENDER VIEW RELATÓRIOS
+  --------------------------------------------------------------------------------------------------------------------------
+  */
+  async renderRelatorios(req, res) {
+    try {
+      const pausas = await Pausa.findAll()
+      let results = []
+      pausas.forEach((valor, index) => {
+        const inicioFormat = datefns.format(valor.inicio, "HH:mm")
+        const fimFormat = datefns.format(valor.fim, "HH:mm")
+        const duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+        const cadastro = datefns.format(valor.createdAt, "dd-MM-yyyy' 'HH:mm")
+        let status = "Ativo"
+        if (valor.ativo === false) {
+          status = "Desativado"
+        }
+        results[index] = {
+          id: valor.id,
+          nome: valor.nome,
+          inicio: inicioFormat,
+          fim: fimFormat,
+          duracao: duracao,
+          cadastradoEm: cadastro,
+          ativo: status
+        }
+        //console.log(results)
+      })
+      return res.render('pausas/relatorios', { pausas: results })
+    } catch (erro) {
+      req.flash('msgErro', 'Falha no processamento da requisição' + erro)
+      res.redirect('/pausas')
+    }
+  },
 }

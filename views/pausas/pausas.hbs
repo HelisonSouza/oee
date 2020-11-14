@@ -19,7 +19,7 @@
             <td>{{nome}}</td>
             <td>{{inicio}}</td>
             <td>{{fim}}</td>
-            <td>{{ducacao}}</td>
+            <td>{{duracao}}</td>
             <td style='width: 40px'>
               <a href="pausas/desativar/{{id}}">
                 <button type="button" class="btn btn-light">
@@ -58,11 +58,11 @@
           </div>
           <div class="form-group">
             <label for="inicio" id="inicio">Inicio</label>
-            <input type="text" class="form-control" id="inicio" name="inicio" placeholder="00:00">
+            <input type="time" class="form-control" id="inicio" name="inicio" placeholder="00:00">
           </div>
           <div class="form-group">
             <label for="fim" id="fim">Fim</label>
-            <input type="text" class="form-control" id="fim" name="fim" placeholder="00:00">
+            <input type="time" class="form-control" id="fim" name="fim" placeholder="00:00">
           </div>
           <button type="submit" class="btn btn-primary">Cadastrar</button>
           <button type="reset" class="btn btn-secondary">Cancelar</button>

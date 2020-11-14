@@ -1,6 +1,7 @@
 const Motivo = require('../models/Motivo');
 const Validacoes = require('../validators/validacoes')
 const validar = new Validacoes()
+const datefns = require('date-fns');
 
 module.exports = {
   async criar(req, res) {
@@ -95,6 +96,32 @@ module.exports = {
       req.flash('msgErro', 'Erro ao editar motivo de parada!   ' + error)
       res.redirect('/')
     }
+  },
+  async renderRelatorios(req, res) {
+    try {
+      var result = []
+      const motivos = await Motivo.findAll().then((dados) => {
+        dados.forEach((valor, index) => {
+          const cadastro = datefns.format(valor.createdAt, "dd-MM-yyyy' 'HH:mm")
+          let status = "Ativo"
+          if (valor.ativo === false) {
+            status = "Desativado"
+          }
+          result[index] = {
+            id: valor.id,
+            descricao: valor.descricao,
+            cadastradoEm: cadastro,
+            ativo: status
+          }
+        })
+      })
+      console.log(result)
+      res.render('motivos/relatorios', { motivos: result })
+    } catch (erro) {
+      req.flash('msgErro', 'Falha no processamento da requisição' + erro)
+      res.redirect('/motivos')
+    }
+
   }
 }
 

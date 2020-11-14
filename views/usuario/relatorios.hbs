@@ -1,0 +1,87 @@
+<div class="container bg-light">
+
+  <div class="row">
+    <div class="col-sm-8">
+      <h2>Relatórios de Usuáros</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Email</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Data de Cadastro</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each usuarios}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{nome}}</td>
+            <td>{{email}}</td>
+            <td>{{tipo}}</td>
+            <td>{{cadastradoEm}}</td>
+            <td>{{ativo}}</td>
+          </tr>
+          {{else}}
+          <tr>
+            <th scope="row">-</th>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-4 ">
+      <!-- Formulário de consulta-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
+        <h4>Consulta de Cadastro de Usuáros:</h4>
+        <form class="m-2" id="formConsulta" action="/producao/relatorio">
+          <div class="form-group">
+            <label>Nome</label>
+            <input type="text" class="form-control" name="produtoNome" placeholder="Digite o nome">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" name="email" placeholder="Digite o e-mail">
+          </div>
+          <div class="form-group">
+            <label>Data de cadastro igual a:</label>
+            <input type="date" class="form-control" name="dataExata">
+          </div>
+          <div class="form-group">
+            <label>Cadastrado no Período entre:</label>
+            <input type="date" class="form-control" name="incioPeriodo">
+          </div>
+          <div class="form-group">
+            <input type="date" class="form-control" name="fimPeriodo">
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select class="form-control" id="status" name="tipo">
+              <option></option>
+              <option>Operador</option>
+              <option>PCP</option>
+              <option>Gestor</option>
+              <option>Administrador</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status do Cadastro</label>
+            <select class="form-control" id="status" name="status">
+              <option></option>
+              <option>Ativo</option>
+              <option>Desativado</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Consultar</button>
+          <button type="reset" class="btn btn-secondary">Cancelar</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>

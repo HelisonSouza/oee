@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken')
 const secret = require('../config/chave.json')
 const bcrypt = require('bcryptjs')
+const datefns = require('date-fns');
 
 
 module.exports = {
@@ -279,6 +280,34 @@ module.exports = {
         res.redirect('/usuarios')
       }
     }
+  },
+  async renderRelatorios(req, res) {
+    try {
+      var result = []
+      const usuarios = await Usuario.findAll().then((dados) => {
+        dados.forEach((valor, index) => {
+          const cadastro = datefns.format(valor.createdAt, "dd-MM-yyyy' 'HH:mm")
+          let status = "Ativo"
+          if (valor.ativo === false) {
+            status = "Desativado"
+          }
+          result[index] = {
+            id: valor.id,
+            nome: valor.nome,
+            email: valor.email,
+            tipo: valor.tipo,
+            cadastradoEm: cadastro,
+            ativo: status
+          }
+        })
+      })
+      console.log(result)
+      res.render('usuario/relatorios', { usuarios: result })
+    } catch (erro) {
+      req.flash('msgErro', 'Falha no processamento da requisição' + erro)
+      res.redirect('/usuarios')
+    }
+
   }
 
 }

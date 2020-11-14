@@ -11,5 +11,6 @@ routes.post('/pausas/:pausa_id/associar', Producao_Pausa.associar)
 routes.get('/pausas/editar/:id', PausaController.formEdit)
 routes.post('/pausas/editar/:id', PausaController.editar)
 routes.get('/pausas/desativar/:id', PausaController.desativar)
+routes.get('/pausas/relatorios', PausaController.renderRelatorios)
 
 module.exports = routes;

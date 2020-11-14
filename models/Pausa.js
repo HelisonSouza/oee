@@ -4,8 +4,8 @@ class Pausa extends Model {
   static init(sequelize) {
     super.init({
       nome: DataTypes.STRING,
-      inicio: DataTypes.TIME,
-      fim: DataTypes.TIME,
+      inicio: DataTypes.DATE,
+      fim: DataTypes.DATE,
       ativo: DataTypes.BOOLEAN
     }, {
       sequelize
