@@ -2,6 +2,7 @@
 
   <div class="row">
     <div class="col-sm-8">
+      <h3>Produções Cadastradas</h3>
       <table class="table">
         <thead>
           <tr>
@@ -10,8 +11,9 @@
             <th scope="col">Lote</th>
             <th scope="col">Produto</th>
             <th scope="col">Planejado</th>
-            <th scope="col">Produzido</th>
-            <th scope="col">Defeito</th>
+            <th scope="col">Pausas</th>
+            <th scope="col">Desativar</th>
+            <th scope="col">Editar</th>
           </tr>
         </thead>
         <tbody>
@@ -22,21 +24,26 @@
             <td>{{lote}}</td>
             <td>{{produto_id}}</td>
             <td>{{qtd_planejada}}</td>
-            <td>{{qtd_produzida}}</td>
-            <td>{{qtd_defeito}}</td>
 
             <td style='width: 40px'>
               <a href="/producao/atribuir_pausas/{{id}}">
                 <button type="button" class="btn btn-light">
-                  <img src="/bootstrap/icons/watch.svg" alt="atribuir_pausas" width="24" height="24"
-                    title="atribuir_pausas">
+                  <img src="/bootstrap/icons/watch.svg" alt="Atribuir Pausa" width="24" height="24"
+                    title="Atribuir Pausa">
+                </button>
+              </a>
+            </td>
+            <td style='width: 40px'>
+              <a href="producao/desativar/{{id}}">
+                <button type="button" class="btn btn-light">
+                  <img src="/bootstrap/icons/trash.svg" alt="Desativar" width="24" height="24" title="Desativar">
                 </button>
               </a>
             </td>
             <td style='width: 40px'>
               <a href="/producao/editar/{{id}}">
                 <button type="button" class="btn btn-light">
-                  <img src="/bootstrap/icons/pencil-square.svg" alt="editar" width="24" height="24" title="editar">
+                  <img src="/bootstrap/icons/pencil-square.svg" alt="Editar" width="24" height="24" title="Editar">
                 </button>
               </a>
             </td>
@@ -56,7 +63,7 @@
     <div class="col-sm-4 ">
       <!-- Formulário de cadastro-->
       <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
-        <h4>Cadastro de Produção:</h4>
+        <h4>Cadastrar Produção:</h4>
         <form class="m-2" action="/producao/cadastrar" method="POST">
           <div class="form-group">
             <label for="data">Data</label>

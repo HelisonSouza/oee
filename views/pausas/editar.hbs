@@ -14,11 +14,12 @@
         </thead>
         <tbody>
           <tr>
-            <th scope="row">{{pausas.id}}</th>
-            <td>{{pausas.nome}}</td>
-            <td>{{pausas.inicio}}</td>
-            <td>{{pausas.fim}}</td>
-            <td>{{pausas.ducacao}}</td>
+            {{#each pausas}}
+            <th scope="row">{{id}}</th>
+            <td>{{nome}}</td>
+            <td>{{inicio}}</td>
+            <td>{{fim}}</td>
+            <td>{{duracao}}</td>
           </tr>
         </tbody>
       </table>
@@ -28,24 +29,25 @@
       <!-- Formulário de edição-->
       <div class="shadow p-3 mb-5 mt-4 bg-white rounded ">
         <h4>Editar Pausa:</h4>
-        <form class="m-2" action="/pausas/editar/{{pausas.id}}" method="POST">
+        <form class="m-2" action="/pausas/editar/{{id}}" method="POST">
           <div class="form-group">
             <label for="nome" id="nome">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome" value="{{pausas.nome}}">
+            <input type="text" class="form-control" id="nome" name="nome" value="{{nome}}">
           </div>
           <div class="form-group">
             <label for="inicio" id="inicio">Inicio</label>
-            <input type="text" class="form-control" id="inicio" name="inicio" value="{{pausas.inicio}}">
+            <input type="time" class="form-control" id="inicio" name="inicio" value="{{inicio}}">
           </div>
           <div class="form-group">
             <label for="fim" id="fim">Fim</label>
-            <input type="text" class="form-control" id="fim" name="fim" value="{{pausas.fim}}">
+            <input type="time" class="form-control" id="fim" name="fim" value="{{fim}}">
           </div>
           <button type="submit" class="btn btn-primary">Salvar</button>
           <a href="/pausas">
             <button type="button" class="btn btn-secondary">Cancelar</button>
           </a>
       </div>
+      {{/each}}
       </form>
     </div>
   </div>

@@ -12,4 +12,5 @@ routes.post('/produtos/editar/:id', ProdutoController.editar)
 routes.get('/produtos/desativar/:id', ProdutoController.desativar)
 routes.get('/produtos/relatorios', ProdutoController.renderRelatorios)
 
+
 module.exports = routes;

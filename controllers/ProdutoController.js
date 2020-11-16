@@ -1,4 +1,5 @@
 const Produto = require('../models/Produto');
+const { Op } = require('sequelize');
 const Validacoes = require('../validators/validacoes')
 const validar = new Validacoes()
 const datefns = require('date-fns');
@@ -16,8 +17,7 @@ module.exports = {
     const { nome, descricao } = req.body
     //passando velocidade para um float    
     const velocidade = parseFloat(req.body.velocidade)
-    console.log(velocidade)
-    console.log(typeof velocidade)
+    
     if (velocidade == 'NaN') {
       req.flash('msgErro', 'O valor do campo velocidade deve ser um número, tente novamente')
       res.redirect('/produtos')
@@ -31,7 +31,7 @@ module.exports = {
     if (!validar.isValid()) {
       const erros = validar.errors()
       erros.forEach((value) => {
-        console.log(value.message)
+        
         req.flash('msgErro', `${value.message}`)
       })
       res.redirect('/produtos')
@@ -195,8 +195,21 @@ RENDER VIEW RELATÓRIO DE PRODUTOS
 */
   async renderRelatorios(req, res) {
     try {
+      let inicioPeriodo = new Date("2020-07-07")
+      let fimPeriodo = new Date("2050-07-07")
+
+      if (req.query.inicioPeriodo) inicioPeriodo = req.query.inicioPeriodo
+      if (req.query.fimPeriodo) fimPeriodo = req.query.fimPeriodo
+
       var result = []
-      const produtos = await Produto.findAll().then((dados) => {
+      const produtos = await Produto.findAll({
+        where: {
+          createdAt: {
+            [Op.gte]: inicioPeriodo,
+            [Op.lt]: fimPeriodo
+          }
+        }
+      }).then((dados) => {
         dados.forEach((valor, index) => {
           const newDate = datefns.format(valor.createdAt, "dd-MM-yyyy' 'HH:mm")
           let status = "Ativo"
@@ -213,7 +226,6 @@ RENDER VIEW RELATÓRIO DE PRODUTOS
           }
         })
       })
-      console.log(result)
       res.render('produtos/relatorios', { produtos: result })
     } catch (erro) {
       req.flash('msgErro', 'Falha no processamento da requisição' + erro)

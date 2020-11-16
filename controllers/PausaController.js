@@ -54,33 +54,32 @@ module.exports = {
   --------------------------------------------------------------------------------------------------------------------------
   */
   async formEdit(req, res) {
-    //pega o id
-    const id = req.params.id
-    // validações 
-    validar.isRequired(id, 'Pausa inválida ')
-    // Se os dados forem inválidos, retorna com a mensagem do erro
-    if (!validar.isValid()) {
-      const erros = validar.errors()
-      erros.forEach((value) => {
-        console.log(value.message)
-        req.flash('msgErro', `${value.message}`)
-      })
-      res.redirect('/pausas')
-    } else {
-      // Passou nas validações
-      try {
-        //busca dados pelo id
-        const dados = await Pausa.findOne({ where: { id: id } })
-        if (!dados) {
-          req.flash('msgErro', 'Pausa não existe')
-          res.redirect('/pausas')
-        } else {
-          res.render('pausas/editar', { pausas: dados })
+    try {
+      //pega o id
+      const id = req.params.id
+
+      let results = []
+      //busca dados pelo id
+      const pausas = await Pausa.findAll({ where: { id: id } })
+
+      pausas.forEach((valor, index) => {
+        const inicioFormat = datefns.format(valor.inicio, "HH:mm")
+        const fimFormat = datefns.format(valor.fim, "HH:mm")
+        const duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+        results[index] = {
+          id: valor.id,
+          nome: valor.nome,
+          inicio: inicioFormat,
+          fim: fimFormat,
+          duracao: duracao
         }
-      } catch {
-        req.flash('msgErro', 'Falha no processamento da requisição')
-        res.redirect('/pausas')
-      }
+        //console.log(results)
+      })
+
+      res.render('pausas/editar', { pausas: results })
+    } catch (erro) {
+      req.flash('msgErro', 'Falha no processamento da requisição  ' + (erro))
+      res.redirect('/pausas')
     }
   },
   /*

@@ -1,28 +1,24 @@
 <div class="container bg-light">
-
   <div class="row">
     <div class="col-sm-8">
       <table class="table">
         <thead>
           <tr>
             <th scope="col">id</th>
-            <th scope="col">Data de Inicio</th>
+            <th scope="col">Data de Planejada</th>
             <th scope="col">Lote</th>
             <th scope="col">Produto</th>
-            <th scope="col">Planejado</th>
-            <th scope="col">Produzido</th>
-            <th scope="col">Defeito</th>
+            <th scope="col">Qtd Planejada</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <th scope="row">{{producao.id}}</th>
-            <td>{{producao.data}}</td>
-            <td>{{producao.lote}}</td>
-            <td>{{producao.produto}}</td>
-            <td>{{producao.qtd_planejada}}</td>
-            <td>{{producao.qtd_produzida}}</td>
-            <td>{{producao.qtd_defeito}}</td>
+            {{#each producao}}
+            <th scope="row">{{id}}</th>
+            <td>{{data}}</td>
+            <td>{{lote}}</td>
+            <td>{{produto_id}}</td>
+            <td>{{qtd_planejada}}</td>
           </tr>
         </tbody>
       </table>
@@ -32,18 +28,22 @@
       <!-- Formulário de edição-->
       <div class="shadow p-3 mb-5 mt-4 bg-white rounded formCadastrarProduto">
         <h4>Editar Produção:</h4>
-        <form class="m-2" action="/producao/editar/{{producao.id}}" method="POST">
+        <form class="m-2" action="/producao/editar/{{id}}" method="POST">
           <div class="form-group">
-            <label for="data">Data de Hora</label>
-            <input type="text" class="form-control" id="data" name="data" value="{{producao.data}}">
+            <label for="data">Data</label>
+            <input type="date" class="form-control" id="data" name="dataSeparada" value="{{dataSeparada}}">
+          </div>
+          <div class="form-group">
+            <label for="inicio">Horário de Inicio</label>
+            <input type="time" class="form-control" id="inicio" name="horaSeparada" value="{{horaSeparada}}">
           </div>
           <div class="form-group">
             <label for="lote">Lote</label>
-            <input type="text" class="form-control" id="lote" name="lote" value="{{producao.lote}}">
+            <input type="text" class="form-control" id="lote" name="lote" value="{{lote}}">
           </div>
           <div class="form-group">
             <label for="produto">Produto</label>
-            <input type="text" class="form-control" id="produto" name="produto" value="{{producao.produto}}">
+            <input type="text" class="form-control" id="produto" name="produto" value="{{produto_id}}">
           </div>
           <div>
             <button type="submit" class="btn btn-primary">Salvar</button>
@@ -54,5 +54,6 @@
         </form>
       </div>
     </div>
+    {{/each}}
   </div>
 </div>

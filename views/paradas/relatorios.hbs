@@ -2,29 +2,27 @@
 
   <div class="row">
     <div class="col-sm-8">
-      <h2>Relatórios de Pausas</h2>
+      <h2>Relatórios de Paradas</h2>
       <table class="table">
         <thead>
           <tr>
             <th scope="col">id</th>
-            <th scope="col">Nome</th>
             <th scope="col">Inico</th>
             <th scope="col">Fim</th>
             <th scope="col">Duração</th>
-            <th scope="col">Data de Cadastro</th>
-            <th scope="col">Status</th>
+            <th scope="col">Motivo</th>
+            <th scope="col">Usuário</th>
           </tr>
         </thead>
         <tbody>
-          {{#each pausas}}
+          {{#each paradas}}
           <tr>
             <th scope="row">{{id}}</th>
-            <td>{{nome}}</td>
             <td>{{inicio}}</td>
             <td>{{fim}}</td>
             <td>{{duracao}}</td>
-            <td>{{cadastradoEm}}</td>
-            <td>{{ativo}}</td>
+            <td>{{motivo}}</td>
+            <td>{{usuario}}</td>
           </tr>
           {{else}}
           <tr>
@@ -40,26 +38,22 @@
     <div class="col-sm-4 ">
       <!-- Formulário de consulta-->
       <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
-        <h4>Consulta de Cadastro de Pausas:</h4>
+        <h4>Consulta de Cadastro de Paradas:</h4>
         <form class="m-2" id="formConsulta" method="GET">
           <div class="form-group">
-            <label>Nome da Pausa</label>
-            <input type="text" class="form-control" name="produtoNome" placeholder="Digite o nome da pausa">
-          </div>
-          <div class="form-group">
-            <label>Cadastrado no Período entre:</label>
+            <label>Cadastrado no período inicial entre:</label>
             <input type="date" class="form-control" name="incioPeriodo">
           </div>
           <div class="form-group">
             <input type="date" class="form-control" name="fimPeriodo">
           </div>
           <div class="form-group">
-            <label>Status do Cadastro</label>
-            <select class="form-control" id="status" name="status">
-              <option></option>
-              <option>Ativo</option>
-              <option>Desativado</option>
-            </select>
+            <label>Motivo</label>
+            <input type="text" class="form-control" name="produtoNome" placeholder="Digite o motivo">
+          </div>
+          <div class="form-group">
+            <label>Usuário</label>
+            <input type="text" class="form-control" name="produtoNome" placeholder="Digite o nome do usuário">
           </div>
           <button type="submit" class="btn btn-primary">Consultar</button>
           <button type="reset" class="btn btn-secondary">Cancelar</button>

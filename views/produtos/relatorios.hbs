@@ -39,18 +39,14 @@
       <!-- Formulário de consulta-->
       <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
         <h4>Consulta de Cadastro de Produtos:</h4>
-        <form class="m-2" id="formConsulta" action="/producao/relatorio">
+        <form class="m-2" id="formConsulta" action="/produtos/relatorios" method="GET">
           <div class="form-group">
             <label>Nome do Produto</label>
             <input type="text" class="form-control" name="produtoNome" placeholder="Digite o nome do produto">
           </div>
           <div class="form-group">
-            <label>Data de cadastro igual a:</label>
-            <input type="date" class="form-control" name="dataExata">
-          </div>
-          <div class="form-group">
             <label>Cadastrado no Período entre:</label>
-            <input type="date" class="form-control" name="incioPeriodo">
+            <input type="date" class="form-control" name="inicioPeriodo">
           </div>
           <div class="form-group">
             <input type="date" class="form-control" name="fimPeriodo">

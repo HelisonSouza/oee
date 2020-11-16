@@ -1,5 +1,6 @@
 const Parada = require('../models/Parada');
 const Motivo = require('../models/Motivo');
+const { Op } = require('sequelize');
 const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
 const { ptBR } = require('date-fns/locale');
@@ -60,5 +61,43 @@ module.exports = {
       res.redirect('/paradas')
     }
 
-  }
+  },
+
+  async relatorios(req, res) {
+    try {
+      const paradas = await Parada.findAll({
+        where: {
+          motivo_id: {
+            [Op.eq]: 4
+          }
+        },
+        include: [
+          { association: 'motivo' },
+          { association: 'usuario' }
+        ]
+      })
+      console.log(paradas)
+      let results = []
+      paradas.forEach((valor, index) => {
+        const inicioFormat = datefns.format(valor.inicio, "dd/MM/yyyy'  'HH:mm")
+        const fimFormat = datefns.format(valor.fim, "dd/MM/yyyy'  'HH:mm")
+        const duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+
+        results[index] = {
+          id: valor.id,
+          inicio: inicioFormat,
+          fim: fimFormat,
+          duracao: duracao,
+          usuario: valor.usuario.nome,
+          motivo: valor.motivo.descricao,
+
+        }
+        //console.log(results)
+      })
+      return res.render('paradas/relatorios', { paradas: results })
+    } catch (erro) {
+      req.flash('msgErro', 'Falha no processamento da requisição' + erro)
+      res.redirect('/paradas')
+    }
+  },
 }

@@ -75,7 +75,7 @@ module.exports = {
   async criar(req, res) {
     //pega os dados do corpo da requisição
     const { nome, email, senha, tipo } = req.body
-
+    //console.log(req.body)
     //Validações
     validar.isRequired(nome, '   Nome não informado')
     validar.isValid(nome, '   Nome inválido ')
@@ -98,9 +98,7 @@ module.exports = {
           //Verifica se o usuário já está cadastrado
           const usuario = await Usuario.count({
             where: {
-              email: {
-                [Op.eq]: email
-              }
+              email: email
             }
           })
           if (usuario !== 0) {
@@ -284,7 +282,13 @@ module.exports = {
   async renderRelatorios(req, res) {
     try {
       var result = []
-      const usuarios = await Usuario.findAll().then((dados) => {
+      const usuarios = await Usuario.findAll({
+        where: {
+          tipo: {
+            [Op.like]: '%adm%'
+          }
+        }
+      }).then((dados) => {
         dados.forEach((valor, index) => {
           const cadastro = datefns.format(valor.createdAt, "dd-MM-yyyy' 'HH:mm")
           let status = "Ativo"
@@ -308,6 +312,6 @@ module.exports = {
       res.redirect('/usuarios')
     }
 
-  }
+  },
 
 }
