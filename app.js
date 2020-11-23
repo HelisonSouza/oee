@@ -79,29 +79,46 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 //Serviço
 server.listen(3000)
 
+module.exports = io
+
 //---------------------------------------------------------------------------------------
 //   Socket.io
 //---------------------------------------------------------------------------------------
 
 io.on('connection', socket => {
 
-  //teste de conecção
-
-  socket.on('teste2', () => {
-    console.log("recebido teste 2")
-    io.emit('teste3', 'ok')
-  })
-
-  socket.on('teste3', () => {
-    console.log('ouviu teste 3')
-  })
-
-
+  // Clientes conectados
   console.log(`Conectado a: ${socket.id}`)
 
-  socket.on('teste', (e) => {
-    console.log('###  teste OK  ' + e)
+  // Recebe o aviso de onload do PAINEL
+  socket.on('onload', () => {
+    let dadosDaProducao = getDadosSessao()                       //Garrega os dados da SESSÃO
+    io.emit('dadosDaProducao', dadosDaProducao)                  //Envia para os dados para os clientes
   })
+
+  //Recebe os evendos do Server Socket-io
+  socket.on('evento', (dados) => {
+    console.log('veio ->' + dados.nome)
+    let qtd_defeito = dados.qtd_defeito + 1
+    let qtd_produzida = dados.qtd_produzida + 1
+    let id = dados.id
+
+    //Evento PRODUTO OK
+    if (dados.nome === 'Produto OK') {
+      atualizarProducacao(id, qtd_produzida);
+    }
+    //Evento PRODUTO COM DEFEITO
+    if (dados.nome === 'Produto com Defeito') {
+      //(id, qtd_defeito)
+    }
+
+  })
+
+  //FUNÇÕES 
+
+  getDadosSessao = () => {
+    return socket.handshake.session.producao                    //Retorna os dados da seção
+  }
 
   atualizarProducacao = async (id, qtd) => {
     //Atualiza Quantidade Produzida
@@ -137,56 +154,5 @@ io.on('connection', socket => {
     retornaQntProduzida(atualizado.qtd_produzida)
     return (atualizado)
   }
-
-
-
-  //envia os dados para socket da view start
-  enviaDados = (atualizado) => {
-    io.emit('producaoDados', atualizado)
-    console.log('socket enviou :' + JSON.stringify(atualizado))
-  }
-
-  enviaOnload = (dados) => {
-    socket.emit('cargaOnload', dados)
-    //console.log('Socket enviou a carga do onload ' + JSON.stringify(dados))
-  }
-
-  retornaQntProduzida = (valorAtual) => {
-    socket.emit('qtdProduzida', valorAtual)
-  }
-
-  //pega os dados da session
-  var producao = socket.handshake.session.producao
-
-  if (producao) {
-
-    //const id = socket.handshake.session.producao.id
-    //var qtd = socket.handshake.session.producao.qtd_produzida
-
-
-    //Recebe os evendos do Server Socket-io
-    socket.on('evento', (dados) => {
-      console.log('veio ->' + dados.nome)
-      let qtd_defeito = dados.qtd_defeito + 1
-      let qtd_produzida = dados.qtd_produzida + 1
-      let id = dados.id
-
-      //Evento PRODUTO OK
-      if (dados.nome === 'Produto OK') {
-        atualizarProducacao(id, qtd_produzida);
-      }
-      //Evento PRODUTO COM DEFEITO
-      if (dados.nome === 'Produto com Defeito') {
-        atualizarProducacaoDefeito(id, qtd_defeito)
-      }
-
-    })
-  }
-
-  //evento que recebe o avido de Onload dos clientes
-  socket.on('onload', (cliente) => {
-    console.log('Onload view' + cliente)
-    atualizaSession(producao)
-  })
 
 })

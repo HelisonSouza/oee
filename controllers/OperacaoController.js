@@ -1,6 +1,5 @@
 const Producao = require('../models/Producao');
 const { Op } = require('sequelize');
-
 const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
 const { ptBR } = require('date-fns/locale');
@@ -51,15 +50,26 @@ module.exports = {
   RENDERIZA VIEW START
   --------------------------------------------------------------------------------------------------------------------------
   */
-  async start(req, res) {
+  async painel(req, res) {
     return res.render('operacao/start')
   },
-  async startId(req, res) {
-    const { id } = req.params
-    const producao = await Producao.findByPk(id)
 
-    req.session.producao = producao
-    res.render('operacao/start')
+  // Inicializa uma produção pasando o ID
+  async start(req, res) {
+    const { id } = req.params                     //pega o ID
+    await Producao.update(                        //altera o status da produção inicializada
+      { status: "executando" },
+      { where: { id: id } }
+    )
+    const producao = await Producao.findByPk(id, {
+      include: {
+        association: 'produto',
+        attributes: ['nome', 'velocidade']
+      }
+    })  //pega os dados
+
+    req.session.producao = producao               //grava na sessão PRODUÇÃO
+    res.render('operacao/start')                  //rederiza a view do painel 
   },
 
   /*

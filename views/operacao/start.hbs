@@ -1,4 +1,5 @@
 <div class="container bg-light">
+  <h4>Painel de Operação</h4>
   <div class="row">
     <div class="col-sm-8">
       <div class="row">
@@ -71,13 +72,14 @@
         <p class="d-inline">unidades </p>
         <br>
         <p class="d-inline">Lote: </p>
-        <p class="d-inline"> </p>
+        <p class="d-inline" id="lote"> </p>
         <br>
         <p class="d-inline">Meta: </p>
-        <p class="d-inline">15 </p>
+        <p class="d-inline" id="meta">00 </p>
         <p class="d-inline">und/min</p>
         <br>
         <p class="d-inline">Inicio: </p>
+        <p class="d-inline" id="inicio"> </p>
         <script>
 
         </script>
@@ -144,46 +146,52 @@
   //aponta pra o socket server
   var socket = io()
 
+  // Informa a view que uma produção foi inicialiazada
   window.onload = () => {
-    socket.emit('onload', 'onload cliente 3000')
+    socket.emit('onload')
   }
 
-  //teste de comunicação
-  socket.on('teste2', () => {
-    console.log("recebido teste 2")
-  })
-
-  socket.on('teste3', () => {
-    console.log("recebido teste 3")
-  })
-
-  socket.on('connect', () => {
-    console.log(`Conectado: ${socket.id}`)
-    socket.emit('teste', socket.id)
-
-  })
-
-  //recebe o evento de envio dos dados da produção
-  socket.on('producaoDados', (dadosRecebidos) => {
+  //Recebe os dados da produção inicializada
+  socket.on('dadosDaProducao', (dadosRecebidos) => {
     atualizaDados(dadosRecebidos)
     console.log(dadosRecebidos)
   })
 
+
+  socket.on('connect', () => {
+    console.log(`Conectado: ${socket.id}`)
+  })
+
+  //recebe o evento de envio dos dados da produção
+
+
   //recebe a carga de dados quando OnLoad
   socket.on('cargaOnload', (dadosRecebidos) => {
     atualizaDados(dadosRecebidos)
-    console.log('dados recebidos quando Onload' + JSON.stringify(dadosRecebidos))
+    //console.log('dados recebidos quando Onload' + JSON.stringify(dadosRecebidos))
   })
 
   atualizaDados = (dadosRecebidos => {
+    //Formata datas
+    const data = dadosRecebidos.data;
+    const dataFormatada = dateFns.format(data, "YY/MM/YYYY - HH:mm")
+
     //Atualiza o value dos elementos
     document.getElementById('status').innerHTML = "Start"
     document.getElementById('realizado').innerHTML = dadosRecebidos.qtd_produzida
     document.getElementById('falta').innerHTML = dadosRecebidos.qtd_planejada - dadosRecebidos.qtd_produzida
-    document.getElementById('velocidade').innerHTML = 100
+    document.getElementById('velocidade').innerHTML = dadosRecebidos.produto.velocidade
     document.getElementById('enceraEm').innerHTML = "00:00"
     document.getElementById('defeito').innerHTML = dadosRecebidos.qtd_defeito
+    document.getElementById('produto').innerHTML = dadosRecebidos.produto.nome
+    document.getElementById('quantidade').innerHTML = dadosRecebidos.qtd_planejada
+    document.getElementById('lote').innerHTML = dadosRecebidos.lote
+    document.getElementById('meta').innerHTML = dadosRecebidos.produto.velocidade
+    document.getElementById('inicio').innerHTML = dataFormatada
   })
+
+
+
 
 </script>
 

@@ -9,7 +9,8 @@ class Producao extends Model {
       qtd_produzida: DataTypes.INTEGER,
       qtd_defeito: DataTypes.INTEGER,
       status: DataTypes.STRING,
-      finalizadaEm: DataTypes.DATE
+      finalizadaEm: DataTypes.DATE,
+      ativo: DataTypes.BOOLEAN
     }, {
       sequelize,
       tableName: 'Producoes'
