@@ -30,6 +30,7 @@ require('./database/index')
 
 //models
 const Producao = require('./models/Producao');
+const { resolve } = require('path');
 
 //instancias do Express, Server e Socket.io
 const app = express();
@@ -87,72 +88,80 @@ module.exports = io
 
 io.on('connection', socket => {
 
+  //Inicializa as variáveis para utilização nos eventos do escopo da conexão
+  let id = 0
+  let qtd_defeito = 0
+  let qtd_produzida = 0
+
   // Clientes conectados
   console.log(`Conectado a: ${socket.id}`)
 
   // Recebe o aviso de onload do PAINEL
   socket.on('onload', () => {
-    let dadosDaProducao = getDadosSessao()                       //Garrega os dados da SESSÃO
-    io.emit('dadosDaProducao', dadosDaProducao)                  //Envia para os dados para os clientes
+    let dadosDaProducao = getDadosSessao()                 //Carrega os dados da SESSÃO
+    enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
   })
 
   //Recebe os evendos do Server Socket-io
   socket.on('evento', (dados) => {
     console.log('veio ->' + dados.nome)
-    let qtd_defeito = dados.qtd_defeito + 1
-    let qtd_produzida = dados.qtd_produzida + 1
-    let id = dados.id
 
     //Evento PRODUTO OK
     if (dados.nome === 'Produto OK') {
-      atualizarProducacao(id, qtd_produzida);
+      atualizaQuantidadeProduzida();
     }
     //Evento PRODUTO COM DEFEITO
     if (dados.nome === 'Produto com Defeito') {
-      //(id, qtd_defeito)
+      atualizarQuantidadeDefeito()
     }
 
   })
 
   //FUNÇÕES 
 
-  getDadosSessao = () => {
-    return socket.handshake.session.producao                    //Retorna os dados da seção
+  let getDadosSessao = () => {
+    return socket.handshake.session.producao                     //Retorna os dados da seção
   }
 
-  atualizarProducacao = async (id, qtd) => {
-    //Atualiza Quantidade Produzida
-    await Producao.update({ qtd_produzida: qtd }, {
+  atualizaSessao = (dados) => {
+    console.log("SESSÃO ATUALIZADA")
+    socket.handshake.session.producao = dados                    //Sobrescreve os dados
+    socket.handshake.session.save()                              //Salva alterações
+  }
+
+  enviaCargaDeDadosAtualizados = (dadosDaProducao) => {
+    //Passa os valores as variáveis inicializadas zeradas
+    console.log('CARGA DE DADOS ENVIADA')
+    id = dadosDaProducao.id
+    qtd_defeito = dadosDaProducao.qtd_defeito
+    qtd_produzida = dadosDaProducao.qtd_produzida
+
+    io.emit('dadosDaProducao', dadosDaProducao)                  //Envia para os dados para os clientes
+  }
+
+  atualizaQuantidadeProduzida = async () => {                   //Atualiza Quantidade Produzida
+    let novoValor = qtd_produzida + 1
+    await Producao.update({ qtd_produzida: novoValor }, {       //Executa o update no banco
       where: { id: id }
     })
-    atualizaSession(await getDados(id))
+    let producaoPercistida = await Producao.findByPk(id)        //Busca os dados atualizados
+    await atualizaSessao(producaoPercistida)                          //Atualiza a sessão
+    //Carrega os dados da SESSÃO
+    let dadosDaProducao = getDadosSessao()
+    await enviaCargaDeDadosAtualizados(dadosDaProducao)               //Envia carga de dados para os clientes
   }
 
-  atualizarProducacaoDefeito = async (id, qtd) => {
-    //Atualiza Quantidade Produzida
-    await Producao.update({ qtd_defeito: qtd }, {
+  atualizarQuantidadeDefeito = async () => {
+    let novoValorDefeito = qtd_defeito + 1
+    await Producao.update({ qtd_defeito: novoValorDefeito }, {       //Executa o update no banco
       where: { id: id }
     })
-    atualizaSession(await getDados(id))
+    let producaoPercistidaDefeito = await Producao.findByPk(id)        //Busca os dados atualizados
+    console.log('PRODUÇÃO PERCISTIDA')
+    await atualizaSessao(producaoPercistidaDefeito)                          //Atualiza a sessão
+    let dadosDaProducaoDefeito = getDadosSessao()                      //Carrega os dados da SESSÃO
+    await enviaCargaDeDadosAtualizados(dadosDaProducaoDefeito)               //Envia carga de dados para os clientes
   }
 
-
-
-  getDados = async (id) => {
-    //Pega os dados atualizadados
-    const dadosAtualizados = await Producao.findByPk(id)
-    return dadosAtualizados.dataValues
-  }
-
-  atualizaSession = async (dados) => {
-    socket.handshake.session.producao = dados
-    socket.handshake.session.save()
-    var atualizado = await socket.handshake.session.producao
-    //console.log('Sessão Atualizada :' + JSON.stringify(dados))
-    enviaDados(atualizado)
-    enviaOnload(atualizado)
-    retornaQntProduzida(atualizado.qtd_produzida)
-    return (atualizado)
-  }
 
 })

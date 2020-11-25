@@ -7,7 +7,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Status</h4>
-              <h1 class="text-success font-weight-bold d-inline" id="status">Rodando</h1>
+              <h1 class="text-success font-weight-bold d-inline" id="status">Aguardando</h1>
             </div>
           </div>
         </div>
@@ -15,7 +15,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Realizado</h4>
-              <h1 class="text-primary font-weight-bold d-inline" id="realizado">130</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="realizado">00</h1>
               <p class="d-inline m-2">und</p>
             </div>
           </div>
@@ -24,7 +24,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Falta</h4>
-              <h1 class="text-primary font-weight-bold d-inline" id="falta">90</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="falta">00</h1>
               <p class="d-inline m-2">und</p>
             </div>
           </div>
@@ -33,7 +33,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Velocidade Média</h4>
-              <h1 class="text-primary font-weight-bold d-inline" id="velocidade">14</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="velocidade">00</h1>
               <p class="d-inline ml-2">/min</p>
             </div>
           </div>
@@ -41,8 +41,8 @@
         <div class="col-sm-4">
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
-              <h4 class="card-title">Enceramento em </h4>
-              <h1 class="text-primary font-weight-bold d-inline" id="enceraEm">00:33</h1>
+              <h4 class="card-title">Encerramento em </h4>
+              <h1 class="text-primary font-weight-bold d-inline" id="enceraEm">00:00</h1>
               <p class="d-inline ml-2"> min</p>
             </div>
           </div>
@@ -51,7 +51,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Defeito </h4>
-              <h1 class="text-danger font-weight-bold d-inline" id="defeito">11</h1>
+              <h1 class="text-danger font-weight-bold d-inline" id="defeito">00</h1>
               <p class="d-inline ml-2"> und</p>
             </div>
           </div>
@@ -145,6 +145,9 @@
 
   //aponta pra o socket server
   var socket = io()
+  socket.on('connect', () => {
+    console.log(`Conectado: ${socket.id}`)
+  })
 
   // Informa a view que uma produção foi inicialiazada
   window.onload = () => {
@@ -158,20 +161,7 @@
   })
 
 
-  socket.on('connect', () => {
-    console.log(`Conectado: ${socket.id}`)
-  })
-
-  //recebe o evento de envio dos dados da produção
-
-
-  //recebe a carga de dados quando OnLoad
-  socket.on('cargaOnload', (dadosRecebidos) => {
-    atualizaDados(dadosRecebidos)
-    //console.log('dados recebidos quando Onload' + JSON.stringify(dadosRecebidos))
-  })
-
-  atualizaDados = (dadosRecebidos => {
+  atualizaDados = (dadosRecebidos) => {
     //Formata datas
     const data = dadosRecebidos.data;
     const dataFormatada = dateFns.format(data, "YY/MM/YYYY - HH:mm")
@@ -180,18 +170,15 @@
     document.getElementById('status').innerHTML = "Start"
     document.getElementById('realizado').innerHTML = dadosRecebidos.qtd_produzida
     document.getElementById('falta').innerHTML = dadosRecebidos.qtd_planejada - dadosRecebidos.qtd_produzida
-    document.getElementById('velocidade').innerHTML = dadosRecebidos.produto.velocidade
+    //document.getElementById('velocidade').innerHTML = dadosRecebidos.produto.velocidade
     document.getElementById('enceraEm').innerHTML = "00:00"
     document.getElementById('defeito').innerHTML = dadosRecebidos.qtd_defeito
-    document.getElementById('produto').innerHTML = dadosRecebidos.produto.nome
+    //document.getElementById('produto').innerHTML = dadosRecebidos.produto.nome
     document.getElementById('quantidade').innerHTML = dadosRecebidos.qtd_planejada
     document.getElementById('lote').innerHTML = dadosRecebidos.lote
-    document.getElementById('meta').innerHTML = dadosRecebidos.produto.velocidade
+    //document.getElementById('meta').innerHTML = dadosRecebidos.produto.velocidade
     document.getElementById('inicio').innerHTML = dataFormatada
-  })
-
-
-
+  }
 
 </script>
 
