@@ -1,22 +1,21 @@
+const registroVelocidadeMedia = [12.5, 10.3, 15.8]
 
-const valorInicial = 10
 
-var results = []
+calculaMediaGeralVelocidade = () => {
+  let soma = 0
+  let avg = 0
+  for (let i = 0; i < registroVelocidadeMedia.length; i++) {
+    soma += registroVelocidadeMedia[i]
+  }
 
-var result = soma = (num1) => {
-  return num1++
+  if (soma == 0) {
+    avg = 0
+  } else {
+    avg = soma / registroVelocidadeMedia.length
+  }
+
+  return avg
 }
 
-setInterval(() => {
-  soma(valorInicial)
-  results.push(result)
-  console.log(results.length)
-}, 1000)
 
-/*
-
-10 + 1 = 11
-11 + 1 = 12
-12 + 1 = 13
-
-*/
+console.log(calculaMediaGeralVelocidade())

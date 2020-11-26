@@ -93,6 +93,11 @@ io.on('connection', socket => {
   let qtd_defeito = 0
   let qtd_produzida = 0
 
+  let intervaloEventos = 0
+  let startCronometro
+  const registroVelocidadeMedia = []
+  let mediaGeralVelocidade = 0
+
   // Clientes conectados
   console.log(`Conectado a: ${socket.id}`)
 
@@ -100,6 +105,7 @@ io.on('connection', socket => {
   socket.on('onload', () => {
     let dadosDaProducao = getDadosSessao()                 //Carrega os dados da SESSÃO
     enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
+    calculaIntervalo()
   })
 
   //Recebe os evendos do Server Socket-io
@@ -109,6 +115,7 @@ io.on('connection', socket => {
     //Evento PRODUTO OK
     if (dados.nome === 'Produto OK') {
       atualizaQuantidadeProduzida();
+      calculaIntervalo()
     }
     //Evento PRODUTO COM DEFEITO
     if (dados.nome === 'Produto com Defeito') {
@@ -141,7 +148,10 @@ io.on('connection', socket => {
 
   atualizaQuantidadeProduzida = async () => {                   //Atualiza Quantidade Produzida
     let novoValor = qtd_produzida + 1
-    await Producao.update({ qtd_produzida: novoValor }, {       //Executa o update no banco
+    await Producao.update({                                     //Executa o update no banco
+      qtd_produzida: novoValor,
+      velocidade_media: mediaGeralVelocidade
+    }, {
       where: { id: id }
     })
     let producaoPercistida = await Producao.findByPk(id)        //Busca os dados atualizados
@@ -161,6 +171,42 @@ io.on('connection', socket => {
     await atualizaSessao(producaoPercistidaDefeito)                          //Atualiza a sessão
     let dadosDaProducaoDefeito = getDadosSessao()                      //Carrega os dados da SESSÃO
     await enviaCargaDeDadosAtualizados(dadosDaProducaoDefeito)               //Envia carga de dados para os clientes
+  }
+
+  calculaIntervalo = () => {
+    if (intervaloEventos > 0) {
+      let mediaVelociadeEvento = (60 / intervaloEventos)
+      registroVelocidadeMedia.push(parseFloat(mediaVelociadeEvento))
+    }
+    mediaGeralVelocidade = calculaMediaGeralVelocidade()
+    zerarIntervalo()
+    clearInterval(startCronometro)
+    cronometro()
+  }
+
+  cronometro = () => {
+    startCronometro = setInterval(function () {
+      intervaloEventos+= 0.1
+    }, 100)
+  }
+
+  zerarIntervalo = () => {
+    intervaloEventos = 0
+  }
+
+  calculaMediaGeralVelocidade = () => {
+    let soma = 0
+    let avg = 0
+    for (let i = 0; i < registroVelocidadeMedia.length; i++) {
+      soma += registroVelocidadeMedia[i]
+    }
+    if (soma == 0) {
+      avg = 0
+    } else {
+      avg = soma / registroVelocidadeMedia.length
+    }
+
+    return avg
   }
 
 
