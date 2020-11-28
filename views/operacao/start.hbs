@@ -1,5 +1,5 @@
 <div class="container bg-light">
-  <h4>Painel de Operação</h4>
+  <h4>Painel Indicadores da Produção</h4>
   <div class="row">
     <div class="col-sm-8">
       <div class="row">
@@ -7,7 +7,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Status</h4>
-              <h1 class="text-success font-weight-bold d-inline" id="status">Aguardando</h1>
+              <h1 class="font-weight-bold d-inline" id="status">Start</h1>
             </div>
           </div>
         </div>
@@ -43,7 +43,6 @@
             <div class="card-body text-center">
               <h4 class="card-title">Encerramento em </h4>
               <h1 class="text-primary font-weight-bold d-inline" id="enceraEm">00:00</h1>
-              <p class="d-inline ml-2"> min</p>
             </div>
           </div>
         </div>
@@ -142,6 +141,12 @@
 <script src="/socket.io/socket.io.js"> </script>
 
 <script>
+  //inicializa variáveis
+  let encerramentoEm = 0
+  let velocidadeMedia = 0
+  let falta = 0
+  let segundosTotais = 0
+  let status = "Rodando"
 
   //aponta pra o socket server
   var socket = io()
@@ -155,11 +160,20 @@
   }
 
   //Recebe os dados da produção inicializada
-  socket.on('dadosDaProducao', (dadosRecebidos) => {
-    atualizaDados(dadosRecebidos)
-    console.log(dadosRecebidos)
+  socket.on('dadosDaProducao', (dadosDaProducao) => {
+    console.log(dadosDaProducao)
+    velocidadeMedia = dadosDaProducao.velocidade_media
+    falta = (dadosDaProducao.qtd_planejada - dadosDaProducao.qtd_produzida)
+    calculaTempoEstimadoEnceramento()
+    atualizaDados(dadosDaProducao)
   })
 
+  //Recebe os dados adicionais
+  socket.on('dadosAdicionais', (dados) => {
+    console.log(dados)
+    status = dados.status
+    atualizaDadosAdicionais()
+  })
 
   atualizaDados = (dadosRecebidos) => {
     //Formata datas
@@ -167,17 +181,41 @@
     const dataFormatada = dateFns.format(data, "YY/MM/YYYY - HH:mm")
 
     //Atualiza o value dos elementos
-    document.getElementById('status').innerHTML = "Start"
+
     document.getElementById('realizado').innerHTML = dadosRecebidos.qtd_produzida
-    document.getElementById('falta').innerHTML = dadosRecebidos.qtd_planejada - dadosRecebidos.qtd_produzida
-    document.getElementById('velocidade').innerHTML = dadosRecebidos.velocidade_media
-    document.getElementById('enceraEm').innerHTML = "00:00"
+    document.getElementById('falta').innerHTML = falta
+    document.getElementById('velocidade').innerHTML = velocidadeMedia
+    document.getElementById('enceraEm').innerHTML = encerramentoEm
     document.getElementById('defeito').innerHTML = dadosRecebidos.qtd_defeito
-    //document.getElementById('produto').innerHTML = dadosRecebidos.produto.nome
+    document.getElementById('produto').innerHTML = dadosRecebidos.produto.nome
     document.getElementById('quantidade').innerHTML = dadosRecebidos.qtd_planejada
     document.getElementById('lote').innerHTML = dadosRecebidos.lote
-    //document.getElementById('meta').innerHTML = dadosRecebidos.produto.velocidade
+    document.getElementById('meta').innerHTML = dadosRecebidos.produto.velocidade
     document.getElementById('inicio').innerHTML = dataFormatada
+  }
+
+  atualizaDadosAdicionais = () => {
+    if (status === "Parada")
+      document.getElementById('status').style.color = '#FF0000'
+
+    if (status === "Rodando")
+      document.getElementById('status').style.color = '#00cc00'
+
+    document.getElementById('status').innerHTML = status
+  }
+
+  calculaTempoEstimadoEnceramento = () => {
+    segundosTotais = (falta / velocidadeMedia) * 60
+
+    let h = parseInt(segundosTotais / 3600)
+    let m = parseInt((segundosTotais % 3600) / 60)
+    let s = parseInt((segundosTotais % 3600) % 60)
+
+    h = ((h < 10) ? "0" : "") + h
+    m = ((m < 10) ? ":0" : ":") + m
+    s = ((s < 10) ? ":0" : ":") + s
+
+    encerramentoEm = `${h}${m}${s}`
   }
 
 </script>

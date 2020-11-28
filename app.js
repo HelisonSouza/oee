@@ -30,6 +30,7 @@ require('./database/index')
 
 //models
 const Producao = require('./models/Producao');
+const Parada = require('./models/Parada');
 const { resolve } = require('path');
 
 //instancias do Express, Server e Socket.io
@@ -92,11 +93,18 @@ io.on('connection', socket => {
   let id = 0
   let qtd_defeito = 0
   let qtd_produzida = 0
+  let status = "Rodando"
+
+  const outrosDados = {
+    status: status
+  }
 
   let intervaloEventos = 0
   let startCronometro
   const registroVelocidadeMedia = []
   let mediaGeralVelocidade = 0
+
+  let horarioRegistroInicioUltimaParada = Date.now()
 
   // Clientes conectados
   console.log(`Conectado a: ${socket.id}`)
@@ -105,45 +113,66 @@ io.on('connection', socket => {
   socket.on('onload', () => {
     let dadosDaProducao = getDadosSessao()                 //Carrega os dados da SESSÃO
     enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
+    registroVelocidadeMedia.push(dadosDaProducao.velocidade_media)
     calculaIntervalo()
   })
 
-  //Recebe os evendos do Server Socket-io
+  //Recebe os evendos do Server Socket-io__________________________________________________________
   socket.on('evento', (dados) => {
     console.log('veio ->' + dados.nome)
 
     //Evento PRODUTO OK
     if (dados.nome === 'Produto OK') {
+      alteraStatus("Rodando")
+      enviaDadosAdicionais()
       atualizaQuantidadeProduzida();
       calculaIntervalo()
     }
     //Evento PRODUTO COM DEFEITO
     if (dados.nome === 'Produto com Defeito') {
+      alteraStatus("Rodando")
+      enviaDadosAdicionais()
       atualizarQuantidadeDefeito()
+      calculaIntervalo()
+    }
+
+    //Evento PARADA
+    if (dados.nome === 'Inicio Parada') {
+      alteraStatus("Parada")
+      enviaDadosAdicionais()
+      registraInicioParada()
+      gravaHorario()
+    }
+    if (dados.nome === 'Fim Parada') {
+      registraFimParada()
+      alteraStatus("Rodando")
+      enviaDadosAdicionais()
     }
 
   })
 
-  //FUNÇÕES 
+  //  FUNÇÕES_______________________________________________________________________________ 
 
   let getDadosSessao = () => {
     return socket.handshake.session.producao                     //Retorna os dados da seção
   }
 
   atualizaSessao = (dados) => {
-    console.log("SESSÃO ATUALIZADA")
     socket.handshake.session.producao = dados                    //Sobrescreve os dados
     socket.handshake.session.save()                              //Salva alterações
   }
 
   enviaCargaDeDadosAtualizados = (dadosDaProducao) => {
     //Passa os valores as variáveis inicializadas zeradas
-    console.log('CARGA DE DADOS ENVIADA')
     id = dadosDaProducao.id
     qtd_defeito = dadosDaProducao.qtd_defeito
     qtd_produzida = dadosDaProducao.qtd_produzida
 
-    io.emit('dadosDaProducao', dadosDaProducao)                  //Envia para os dados para os clientes
+    io.emit('dadosDaProducao', dadosDaProducao)    //Envia para os dados para os clientes
+  }
+
+  enviaDadosAdicionais = () => {
+    socket.emit('dadosAdicionais', outrosDados)
   }
 
   atualizaQuantidadeProduzida = async () => {                   //Atualiza Quantidade Produzida
@@ -154,7 +183,12 @@ io.on('connection', socket => {
     }, {
       where: { id: id }
     })
-    let producaoPercistida = await Producao.findByPk(id)        //Busca os dados atualizados
+    let producaoPercistida = await Producao.findByPk(id, {       //Busca os dados atualizados
+      include: {
+        association: 'produto',
+        attributes: ['nome', 'velocidade']
+      }
+    })
     await atualizaSessao(producaoPercistida)                          //Atualiza a sessão
     //Carrega os dados da SESSÃO
     let dadosDaProducao = getDadosSessao()
@@ -163,30 +197,59 @@ io.on('connection', socket => {
 
   atualizarQuantidadeDefeito = async () => {
     let novoValorDefeito = qtd_defeito + 1
-    await Producao.update({ qtd_defeito: novoValorDefeito }, {       //Executa o update no banco
+    await Producao.update({                                           //Executa o update no banco
+      qtd_defeito: novoValorDefeito,
+      velocidade_media: mediaGeralVelocidade
+    }, {
       where: { id: id }
     })
-    let producaoPercistidaDefeito = await Producao.findByPk(id)        //Busca os dados atualizados
-    console.log('PRODUÇÃO PERCISTIDA')
-    await atualizaSessao(producaoPercistidaDefeito)                          //Atualiza a sessão
+    let producaoPercistidaDefeito = await Producao.findByPk(id, {     //Busca os dados atualizados
+      include: {
+        association: 'produto',
+        attributes: ['nome', 'velocidade']
+      }
+    })
+    await atualizaSessao(producaoPercistidaDefeito)                    //Atualiza a sessão
     let dadosDaProducaoDefeito = getDadosSessao()                      //Carrega os dados da SESSÃO
-    await enviaCargaDeDadosAtualizados(dadosDaProducaoDefeito)               //Envia carga de dados para os clientes
+    await enviaCargaDeDadosAtualizados(dadosDaProducaoDefeito)         //Envia carga de dados para os clientes
   }
+
+  gravaHorario = () => {
+    horarioRegistroInicioUltimaParada = Date.now()
+  }
+
+  registraInicioParada = async () => {
+    await Parada.create({
+      inicio: Date.now(),
+      producao_id: id,
+    })
+  }
+
+  registraFimParada = async () => {
+    await Parada.update({
+      fim: Date.now()
+    }, {
+      where: { inicio: horarioRegistroInicioUltimaParada }
+    })
+  }
+
+  // VELOCIDADE MÉDIA DE PRODUÇÃO_____________________________________________________________
 
   calculaIntervalo = () => {
-    if (intervaloEventos > 0) {
-      let mediaVelociadeEvento = (60 / intervaloEventos)
-      registroVelocidadeMedia.push(parseFloat(mediaVelociadeEvento))
+    if (intervaloEventos > 0) {                                       //Se intervalo maior que 0
+      let mediaVelociadeEvento = (60 / intervaloEventos)              //Converte em peças/minuto
+      registroVelocidadeMedia.push(parseFloat(mediaVelociadeEvento))  //Registra
     }
-    mediaGeralVelocidade = calculaMediaGeralVelocidade()
-    zerarIntervalo()
-    clearInterval(startCronometro)
-    cronometro()
+    mediaGeralVelocidade = calculaMediaGeralVelocidade()              //Guarda média geral atual
+    //Prepara para o próximo evento
+    zerarIntervalo()                                                  //Zera o valor
+    clearInterval(startCronometro)                                    //Zera o cronometro
+    cronometro()                                                      //Inicializa o cronometro
   }
 
-  cronometro = () => {
+  cronometro = () => {                                          //cronometro registrando 10 ms
     startCronometro = setInterval(function () {
-      intervaloEventos+= 0.1
+      intervaloEventos += 0.1
     }, 100)
   }
 
@@ -205,8 +268,13 @@ io.on('connection', socket => {
     } else {
       avg = soma / registroVelocidadeMedia.length
     }
-
     return avg
+  }
+
+  //  STATUS DA PRODUÇÃO ________________________________________________________________________
+
+  alteraStatus = (valor) => {
+    outrosDados.status = valor
   }
 
 
