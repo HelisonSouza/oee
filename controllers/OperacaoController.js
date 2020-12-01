@@ -1,4 +1,5 @@
 const Producao = require('../models/Producao');
+const Pausa = require('../models/Pausa');
 const { Op } = require('sequelize');
 const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
@@ -62,10 +63,16 @@ module.exports = {
       { where: { id: id } }
     )
     const producao = await Producao.findByPk(id, {
-      include: {
-        association: 'produto',
-        attributes: ['nome', 'velocidade']
-      }
+      include: [
+        {
+          association: 'produto',
+          attributes: ['nome', 'velocidade']
+        },
+        {
+          association: 'pausas',
+          attributes: ['inicio', 'fim']
+        }
+      ]
     })  //pega os dados
 
     req.session.producao = producao               //grava na sessão PRODUÇÃO

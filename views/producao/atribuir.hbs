@@ -1,7 +1,7 @@
 <div class="container bg-light">
-
   <div class="row">
     <div class="col-sm-8">
+      <h4>Produção selecionada</h4>
       <table class="table">
         <thead>
           <tr>
@@ -18,33 +18,90 @@
           <tr>
             {{#each producao}}
             <th scope="row">{{id}}</th>
-            <td>{{data}}</td>
-            <td>{{hora}}</td>
+            <td id="dataInicio">
+              <script>
+                let data = "{{ data }}"
+                let dataFormatada = dateFns.format(data, "YY/MM/YYYY")
+                document.getElementById('dataInicio').innerHTML = dataFormatada
+              </script>
+            </td>
+            <td id="horaInicio">
+              <script>
+                let hora = "{{ data }}"
+                let horaFormatada = dateFns.format(hora, "HH:mm")
+                document.getElementById('horaInicio').innerHTML = horaFormatada
+              </script>
+              {{hora}}
+            </td>
             <td>{{lote}}</td>
-            <td>{{produto_id}}</td>
+            <td>{{produto.nome}}</td>
             <td>{{qtd_planejada}} und</td>
 
             {{/each}}
           </tr>
         </tbody>
       </table>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Pausas atribuidas</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each producao}}
+          {{#pausas}}
+          <tr>
+            <td>{{nome}}</td>
+            <td>
+              <a href="/producao/atribuir_pausa/excluir_atribuicao?id_producao={{../id}}&id_pausa={{id}}">
+                <button type="button" class="btn btn-light">
+                  <img src="/bootstrap/icons/trash.svg" alt="Excluir" width="24" height="24" title="Excluir pausa">
+                </button>
+              </a>
+            </td>
+          </tr>
+          {{/pausas}}
+          {{/each}}
+        </tbody>
+      </table>
     </div>
 
     <div class="col-sm-4 ">
-      <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
+      <!-- Formulário de edição-->
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded formCadastrarProduto">
         <h4>Atribuir pausas a produção:</h4>
         {{#each pausas}}
-        <div class="card m-2">
-          <div class="card-body">
-            <h4 class="card-title">{{nome}}</h4>
-            <p class="card-text">
+        <form class="m-2 p-2 card" method="POST">
+          <div class="form-group">
+            <label for="data">{{nome}}</label>
+            <input type="text" name="pausa_id" value="{{id}}" style="display: none;">
+            <p>das {{inicio}} a {{fim}}
+              com duração de {{duracao}}</p>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">Atribuir</button>
+          </div>
+        </form>
+        {{/each}}
+      </div>
+
+
+      <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
+        <h4></h4>
+        <form>
+          {{#each pausas}}
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="id_pausa">
+            <label class="form-check-label">{{nome}}
+              <br>
               das {{inicio}} a {{fim}}
               com duração de {{duracao}}
-            </p>
-            <a href="./{{id}}" class="btn btn-primary">Atribuir</a>
+            </label>
           </div>
-        </div>
-        {{/each}}
+          {{/each}}
+          <button type="submit" class="btn btn-primary">Atribuir</button>
+        </form>
       </div>
     </div>
   </div>

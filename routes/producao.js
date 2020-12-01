@@ -10,5 +10,7 @@ routes.get('/producao/editar/:id', ProducaoController.formEdit)
 routes.get('/producao/atribuir_pausas/:id', ProducaoController.atribuir)
 routes.get('/producao/relatorios', ProducaoController.renderRelatorios)
 routes.get('/producao/relatorio', ProducaoController.relatorios)
+routes.post('/producao/atribuir_pausas/:id', ProducaoController.atribuirPausa)
+routes.get('/producao/atribuir_pausa/excluir_atribuicao', ProducaoController.excluirAtribuicao)
 
 module.exports = routes;

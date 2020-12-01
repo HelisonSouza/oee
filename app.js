@@ -112,6 +112,7 @@ io.on('connection', socket => {
   // Recebe o aviso de onload do PAINEL
   socket.on('onload', () => {
     let dadosDaProducao = getDadosSessao()                 //Carrega os dados da SESSÃO
+    console.log(dadosDaProducao)
     enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
     registroVelocidadeMedia.push(dadosDaProducao.velocidade_media)
     calculaIntervalo()

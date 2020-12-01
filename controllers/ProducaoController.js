@@ -1,5 +1,6 @@
 const Producao = require('../models/Producao');
 const Pausa = require('../models/Pausa');
+const Producao_Pausa = require('../models/Producao_Pausa')
 const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
 const { ptBR } = require('date-fns/locale');
@@ -132,9 +133,10 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
       //busca dados pelo id
       const producoes = await Producao.findAll({
         where: { id: id },
-        include: {
-          association: 'produto',
-        }
+        include: [
+          { association: 'produto' },
+          { association: 'pausas' }
+        ]
       }).then(res => {
         return res.map(row => {
           return row.dataValues
@@ -174,13 +176,39 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
           duracao
         }
       })
-
-      res.render('producao/atribuir', { producao: resultProducao, pausas: resultPausas })
+      console.log(producoes)
+      res.render('producao/atribuir', { producao: producoes, pausas: resultPausas })
     } catch (erro) {
       req.flash('msgErro', 'Falha no processamento da requisição  ' + erro)
       res.redirect('/producoes')
     }
   },
+
+  async atribuirPausa(req, res) {
+    const { id } = req.params
+    const { pausa_id } = req.body
+    console.log(pausa_id, id)
+    const producao = await Producao.findByPk(id)
+    const pausa = await Pausa.findByPk(pausa_id)
+
+    await producao.addPausa(pausa)
+
+    res.redirect(`/producao/atribuir_pausas/${id}`)
+
+  },
+
+  async excluirAtribuicao(req, res) {
+    const { id_producao } = req.query
+    const { id_pausa } = req.query
+
+    const producao = await Producao.findByPk(id_producao)
+    const pausa = await Pausa.findByPk(id_pausa)
+
+    await producao.removePausa(pausa)
+
+    res.redirect(`/producao/atribuir_pausas/${id_producao}`)
+  },
+
   /*
   --------------------------------------------------------------------------------------------------------------------------
   RENDERIZAR PÁGINA DE RELATÓRIOS
@@ -264,7 +292,7 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
       //console.log(consulta[index])
       if (consulta[index] != "") dadosDaQuery = {index : consulta[index]}
     }
- 
+   
     console.log(dadosDaQuery)
     if(dataExata && dataExata != "") consultar.push[dataExata]
     const producoes = await Producao.findAll({
