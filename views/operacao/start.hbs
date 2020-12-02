@@ -116,19 +116,9 @@
               <th scope="col">Descrição</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Parada</td>
-              <td>08:00 as 08:45</td>
-              <td>00:08:45</td>
-              <td>Bloqueio de emergência</td>
-            </tr>
-            <tr>
-              <td>Pausa</td>
-              <td>08:30 as 08:50</td>
-              <td>00:20:00</td>
-              <td>Pausa do café</td>
-            </tr>
+          <tbody id="listaDeEventos">
+
+          </tbody>
         </table>
       </div>
     </div>
@@ -147,6 +137,7 @@
   let falta = 0
   let segundosTotais = 0
   let status = "Rodando"
+  var dadosPausas = {}
 
   //aponta pra o socket server
   var socket = io()
@@ -166,6 +157,8 @@
     falta = (dadosDaProducao.qtd_planejada - dadosDaProducao.qtd_produzida)
     calculaTempoEstimadoEnceramento()
     atualizaDados(dadosDaProducao)
+    tratarDadosTimeLine(dadosDaProducao)
+    geraEventosDePausas(dadosDaProducao)
   })
 
   //Recebe os dados adicionais
@@ -216,6 +209,58 @@
     s = ((s < 10) ? ":0" : ":") + s
 
     encerramentoEm = `${h}${m}${s}`
+  }
+
+  geraEventosDePausas = (dados) => {
+    let pausas = dados.pausas
+    let results = []
+    pausas.forEach((valor, index) => {
+
+      const inicioFormat = dateFns.format(valor.inicio, "HH:mm")
+      const fimFormat = dateFns.format(valor.fim, "HH:mm")
+
+      date1 = new Date(valor.inicio),
+        date2 = new Date(valor.fim);
+
+      var diffMs = (date2 - date1);
+      var diffHrs = Math.floor((diffMs % 86400000) / 3600000);
+      var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+      diffHrs === 0 ? diffHrs = "00" : ""
+      diffMins === 0 ? diffMins = "00" : ""
+      const duracao = diffHrs + ':' + diffMins + ' m';
+
+      results[index] = {
+        nome: valor.nome,
+        inicio: inicioFormat,
+        fim: fimFormat,
+        duracao: duracao
+      }
+    })
+    addLinhaEventoPausa(results)
+  }
+
+  tratarDadosTimeLine = (dados) => {
+    dados.pausas.map((arr) => {
+      //console.log(arr)
+    })
+  }
+
+  addLinhaEventoPausa = (pausas) => {
+    console.log(pausas)
+    pausas.forEach((pausa) => {
+
+      var tr = document.createElement("tr")
+
+      tr.innerHTML = `
+        <tr>
+          <td>Pausa</td>
+          <td>${pausa.inicio} as ${pausa.fim}</td>
+          <td>${pausa.duracao}</td>
+          <td>${pausa.nome}</td>
+        </tr>
+      `
+      document.getElementById('listaDeEventos').appendChild(tr)
+    })
   }
 
 </script>

@@ -70,7 +70,10 @@ module.exports = {
         },
         {
           association: 'pausas',
-          attributes: ['inicio', 'fim']
+          attributes: ['nome', 'inicio', 'fim'],
+          through: {
+            attributes: []
+          }
         }
       ]
     })  //pega os dados
