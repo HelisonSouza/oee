@@ -45,6 +45,9 @@ module.exports = {
     const producoes = await Producao.findAll({
       include: {
         association: 'produto',
+      },
+      where: {
+        status : 'planejada'
       }
     }).then((dados) => {
       //console.log(dados)

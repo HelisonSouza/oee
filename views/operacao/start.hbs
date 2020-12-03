@@ -82,10 +82,10 @@
         <script>
 
         </script>
-        <p class="d-inline" id="dataInicio"></p>
+        <p class="d-inline"></p>
         <br>
         <p class="d-inline">Fim: </p>
-        <p class="d-inline">20/10/2020 13:30 </p>
+        <p class="d-inline" id="fim"></p>
 
       </div>
 
@@ -134,7 +134,8 @@
   //inicializa variáveis
   let encerramentoEm = 0
   let velocidadeMedia = 0
-  let falta = 0
+  let falta = "00"
+  let fim = 0
   let segundosTotais = 0
   let status = "Rodando"
   var dadosPausas = {}
@@ -154,8 +155,10 @@
   socket.on('dadosDaProducao', (dadosDaProducao) => {
     console.log(dadosDaProducao)
     velocidadeMedia = dadosDaProducao.velocidade_media
-    falta = (dadosDaProducao.qtd_planejada - dadosDaProducao.qtd_produzida)
+    falta = (dadosDaProducao.qtd_planejada - dadosDaProducao.qtd_produzida - dadosDaProducao.qtd_defeito)
     calculaTempoEstimadoEnceramento()
+    calculaFim(dadosDaProducao.data, dadosDaProducao.produto.velocidade, dadosDaProducao.qtd_planejada)
+    sinalizaFimDaProducao(falta)
     atualizaDados(dadosDaProducao)
     tratarDadosTimeLine(dadosDaProducao)
     geraEventosDePausas(dadosDaProducao)
@@ -171,7 +174,7 @@
   atualizaDados = (dadosRecebidos) => {
     //Formata datas
     const data = dadosRecebidos.data;
-    const dataFormatada = dateFns.format(data, "YY/MM/YYYY - HH:mm")
+    const dataFormatada = dateFns.format(data, "DD/MM/YYYY - HH:mm")
 
     //Atualiza o value dos elementos
 
@@ -185,6 +188,7 @@
     document.getElementById('lote').innerHTML = dadosRecebidos.lote
     document.getElementById('meta').innerHTML = dadosRecebidos.produto.velocidade
     document.getElementById('inicio').innerHTML = dataFormatada
+    document.getElementById('fim').innerHTML = fim
   }
 
   atualizaDadosAdicionais = () => {
@@ -193,6 +197,9 @@
 
     if (status === "Rodando")
       document.getElementById('status').style.color = '#00cc00'
+
+    if (status === "Finalizada")
+      document.getElementById('status').style.color = '#0000FF'
 
     document.getElementById('status').innerHTML = status
   }
@@ -208,41 +215,62 @@
     m = ((m < 10) ? ":0" : ":") + m
     s = ((s < 10) ? ":0" : ":") + s
 
+    h = isNaN(h) ? "00" : h
+    m = isNaN(m) ? ":00" : m
+    s = isNaN(s) ? "" : s
+
     encerramentoEm = `${h}${m}${s}`
+
+  }
+
+  calculaFim = (dataInicio, velocidadeMedia, planejado) => {
+    let minutosPlanejados = planejado / velocidadeMedia
+    let result = dateFns.addMinutes(dataInicio, minutosPlanejados)
+    let formatResult = dateFns.format(result, "DD/MM/YYYY - HH:mm:ss")
+    fim = formatResult
+  }
+
+  sinalizaFimDaProducao = (falta) => {
+    console.log("PARA FINALIZAR PRODUÇÃO FALTA = " + falta)
+    if (falta == 0) {
+      console.log("ENVIOU FINALIZAR!!!!")
+      socket.emit('finalizarProducao')
+    }
   }
 
   geraEventosDePausas = (dados) => {
     let pausas = dados.pausas
     let results = []
-    pausas.forEach((valor, index) => {
+    if (pausas) {
 
-      const inicioFormat = dateFns.format(valor.inicio, "HH:mm")
-      const fimFormat = dateFns.format(valor.fim, "HH:mm")
+      pausas.forEach((valor, index) => {
 
-      date1 = new Date(valor.inicio),
-        date2 = new Date(valor.fim);
+        const inicioFormat = dateFns.format(valor.inicio, "HH:mm")
+        const fimFormat = dateFns.format(valor.fim, "HH:mm")
 
-      var diffMs = (date2 - date1);
-      var diffHrs = Math.floor((diffMs % 86400000) / 3600000);
-      var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-      diffHrs === 0 ? diffHrs = "00" : ""
-      diffMins === 0 ? diffMins = "00" : ""
-      const duracao = diffHrs + ':' + diffMins + ' m';
+        date1 = new Date(valor.inicio),
+          date2 = new Date(valor.fim);
 
-      results[index] = {
-        nome: valor.nome,
-        inicio: inicioFormat,
-        fim: fimFormat,
-        duracao: duracao
-      }
-    })
-    addLinhaEventoPausa(results)
+        var diffMs = (date2 - date1);
+        var diffHrs = Math.floor((diffMs % 86400000) / 3600000);
+        var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+        diffHrs === 0 ? diffHrs = "00" : ""
+        diffMins === 0 ? diffMins = "00" : ""
+        const duracao = diffHrs + ':' + diffMins + ' m';
+
+        results[index] = {
+          nome: valor.nome,
+          inicio: inicioFormat,
+          fim: fimFormat,
+          duracao: duracao
+        }
+      })
+      addLinhaEventoPausa(results)
+    }
   }
 
   tratarDadosTimeLine = (dados) => {
-    dados.pausas.map((arr) => {
-      //console.log(arr)
-    })
+
   }
 
   addLinhaEventoPausa = (pausas) => {

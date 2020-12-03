@@ -87,10 +87,11 @@ module.exports = io
 //   Socket.io
 //---------------------------------------------------------------------------------------
 
+let finalizada = 0
 io.on('connection', socket => {
 
   //Inicializa as variáveis para utilização nos eventos do escopo da conexão
-  let id = 0
+  let id = 1
   let qtd_defeito = 0
   let qtd_produzida = 0
   let status = "Rodando"
@@ -113,9 +114,18 @@ io.on('connection', socket => {
   socket.on('onload', () => {
     let dadosDaProducao = getDadosSessao()                 //Carrega os dados da SESSÃO
     console.log(dadosDaProducao)
-    enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
-    registroVelocidadeMedia.push(dadosDaProducao.velocidade_media)
-    calculaIntervalo()
+    if (dadosDaProducao) {
+      enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
+      registroVelocidadeMedia.push(dadosDaProducao.velocidade_media)
+      calculaIntervalo()
+      finalizada = 0
+    }
+  })
+
+  // Recebe o evento que indica o fim da produção
+  socket.on('finalizarProducao', () => {
+    finalizarProducao()
+    console.log("PRODUÇÃO FINALIZADA")
   })
 
   //Recebe os evendos do Server Socket-io__________________________________________________________
@@ -123,14 +133,15 @@ io.on('connection', socket => {
     console.log('veio ->' + dados.nome)
 
     //Evento PRODUTO OK
-    if (dados.nome === 'Produto OK') {
+    if (dados.nome === 'Produto OK' & finalizada == 0) {
+      console.log(finalizada)
       alteraStatus("Rodando")
       enviaDadosAdicionais()
       atualizaQuantidadeProduzida();
       calculaIntervalo()
     }
     //Evento PRODUTO COM DEFEITO
-    if (dados.nome === 'Produto com Defeito') {
+    if (dados.nome === 'Produto com Defeito' & finalizada == 0) {
       alteraStatus("Rodando")
       enviaDadosAdicionais()
       atualizarQuantidadeDefeito()
@@ -138,13 +149,13 @@ io.on('connection', socket => {
     }
 
     //Evento PARADA
-    if (dados.nome === 'Inicio Parada') {
+    if (dados.nome === 'Inicio Parada' & finalizada == 0) {
       alteraStatus("Parada")
       enviaDadosAdicionais()
       registraInicioParada()
       gravaHorario()
     }
-    if (dados.nome === 'Fim Parada') {
+    if (dados.nome === 'Fim Parada' & finalizada === 0) {
       registraFimParada()
       alteraStatus("Rodando")
       enviaDadosAdicionais()
@@ -213,6 +224,19 @@ io.on('connection', socket => {
     await atualizaSessao(producaoPercistidaDefeito)                    //Atualiza a sessão
     let dadosDaProducaoDefeito = getDadosSessao()                      //Carrega os dados da SESSÃO
     await enviaCargaDeDadosAtualizados(dadosDaProducaoDefeito)         //Envia carga de dados para os clientes
+  }
+
+  finalizarProducao = async () => {
+    await Producao.update({                                           //Executa o update no banco
+      status: "finalizada",
+      finalizadaEm: new Date()
+    }, {
+      where: { id: id }
+    })
+    alteraStatus("Finalizada")
+    enviaDadosAdicionais()
+    finalizada = 1
+    console.log(finalizada)
   }
 
   gravaHorario = () => {

@@ -13,6 +13,11 @@ module.exports = {
       where: {
         data: {
           [Op.gte]: new Date()
+        },
+        status: {
+          [Op.or]: [
+            'planejada', 'executando'
+          ]
         }
       },
       include: {
