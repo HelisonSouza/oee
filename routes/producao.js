@@ -6,6 +6,7 @@ const { isAdm } = require('../auth/autenticacao')
 
 routes.post('/producao/cadastrar', ProducaoController.criar)
 routes.get('/producoes', ProducaoController.listar)
+routes.get('/producao/desativar/:id', ProducaoController.desativar)
 routes.get('/producao/editar/:id', ProducaoController.formEdit)
 routes.get('/producao/atribuir_pausas/:id', ProducaoController.atribuir)
 routes.get('/producao/relatorios', ProducaoController.renderRelatorios)

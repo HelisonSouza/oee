@@ -1,6 +1,7 @@
 const Producao = require('../models/Producao');
+const Produto = require('../models/Produto')
 const Pausa = require('../models/Pausa');
-const Producao_Pausa = require('../models/Producao_Pausa')
+
 const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
 const { ptBR } = require('date-fns/locale');
@@ -15,26 +16,32 @@ module.exports = {
   --------------------------------------------------------------------------------------------------------------------------
   */
   async criar(req, res) {
-    const {
-      qtd_planejada,
-      lote,
-      produto_id
-    } = req.body
-    const dataCompleta = req.body.data + ' ' + req.body.inicio
-    const data = new Date(dataCompleta)
+    try {
+      const {
+        qtd_planejada,
+        lote,
+        produto_id
+      } = req.body
+      const dataCompleta = req.body.data + ' ' + req.body.inicio
+      const data = new Date(dataCompleta)
 
-    const producao = await Producao.create({
-      qtd_planejada,
-      lote,
-      data,
-      qtd_produzida: 0,
-      qtd_defeito: 0,
-      usuario_id: 1,
-      produto_id,
-      status: "planejada"
-    })
+      const producao = await Producao.create({
+        qtd_planejada,
+        lote,
+        data,
+        qtd_produzida: 0,
+        qtd_defeito: 0,
+        usuario_id: 1,
+        produto_id,
+        status: "planejada"
+      })
 
-    return res.redirect('/producoes')
+      return res.redirect('/producoes')
+    } catch (error) {
+      req.flash('msgErro', 'Dados inválidos')
+      res.redirect('/producoes')
+    }
+
   },
   /*
   --------------------------------------------------------------------------------------------------------------------------
@@ -42,36 +49,55 @@ module.exports = {
   --------------------------------------------------------------------------------------------------------------------------
   */
   async listar(req, res) {
-    const producoes = await Producao.findAll({
+    const producoes = []
+    await Producao.findAll({
       include: {
         association: 'produto',
+        attributes: ['nome'],
       },
       where: {
-        status : 'planejada'
+        status: 'planejada',
+        ativo: true
       }
     }).then((dados) => {
-      //console.log(dados)
-      var retorno = []
-      dados.forEach((valor, index) => {
-        const newDate = datefns.format(valor.data, "dd-MM-yyyy' 'HH:mm")
+      dados.forEach((dado, i) => {
+        const data = datefns.format(dado.data, "dd/MM/yyyy' as 'HH:mm")
 
-        retorno[index] = {
-          id: valor.id,
-          qtd_planejada: valor.qtd_planejada,
-          lote: valor.lote,
-          data: newDate,
-          qtd_produzida: valor.qtd_produzida,
-          qtd_defeito: valor.qtd_defeito,
-          usuario_id: valor.usuario_id,
-          produto_id: valor.produto.nome,
-          status: valor.status
+        producoes[i] = {
+          id: dado.id,
+          data: data,
+          lote: dado.lote,
+          qtd_planejada: dado.qtd_planejada,
+          produto: dado.produto
         }
       })
-      res.render('producao/producao', { producao: retorno })
     })
-
+    const produtos = await Produto.findAll({
+      where: {
+        ativo: true
+      }
+    })
+    res.render('producao/producao', { producao: producoes, produtos: produtos })
   },
 
+  /*
+ --------------------------------------------------------------------------------------------------------------------------
+ DESATIVA PRODUÇÃO
+ --------------------------------------------------------------------------------------------------------------------------
+ */
+  async desativar(req, res) {
+    try {
+      const { id } = req.params
+
+      await Producao.update({ ativo: false }, { where: { id: id } })
+
+      res.redirect('/producoes')
+    } catch (error) {
+      req.flash('msgErro', 'Falha no processamento da requisição' + error)
+      res.redirect('/producoes')
+    }
+
+  },
   /*
  --------------------------------------------------------------------------------------------------------------------------
  RENDERIZAR O FORMULÁRIO DE EDIÇÃO
@@ -114,7 +140,13 @@ module.exports = {
         }
       })
 
-      res.render('producao/editar', { producao: result })
+      const produtos = await Produto.findAll({
+        where: {
+          ativo: true
+        }
+      })
+
+      res.render('producao/editar', { producao: result, produtos: produtos })
     } catch (error) {
       req.flash('msgErro', 'Falha no processamento da requisição' + error)
       res.redirect('/producoes')

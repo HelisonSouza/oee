@@ -22,7 +22,7 @@
             <th scope="row">{{id}}</th>
             <td>{{data}}</td>
             <td>{{lote}}</td>
-            <td>{{produto_id}}</td>
+            <td>{{produto.nome}}</td>
             <td>{{qtd_planejada}}</td>
 
             <td style='width: 40px'>
@@ -79,7 +79,11 @@
           </div>
           <div class="form-group">
             <label for="produto_id">Produto</label>
-            <input type="text" class="form-control" id="produto" name="produto_id" placeholder="Selecione o produto">
+            <select type="text" class="form-control" name="produto_id">
+              {{#each produtos}}
+              <option value={{id}}>{{nome}}</option>
+              {{/each}}
+            </select>
           </div>
           <div class="form-group">
             <label for="qtd_planejada">Quantidade</label>

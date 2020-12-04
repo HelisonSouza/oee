@@ -42,8 +42,14 @@
             <input type="text" class="form-control" id="lote" name="lote" value="{{lote}}">
           </div>
           <div class="form-group">
-            <label for="produto">Produto</label>
-            <input type="text" class="form-control" id="produto" name="produto" value="{{produto_id}}">
+            <label for="produto_id">Produto</label>
+            <p>Produto cadastrado: {{produto_id}}</p>
+            <p>Selecione outro:</p>
+            <select type="text" class="form-control" name="produto_id">
+              {{#each ../produtos}}
+              <option value={{id}}>{{nome}}</option>
+              {{/each}}
+            </select>
           </div>
           <div>
             <button type="submit" class="btn btn-primary">Salvar</button>
