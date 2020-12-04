@@ -171,6 +171,12 @@
     atualizaDadosAdicionais()
   })
 
+  //Recebe os dados da ultima parada ocorida
+  socket.on('dadosParada', (dados) => {
+    console.log(dados)
+    geraEventoDeParada(dados)
+  })
+
   atualizaDados = (dadosRecebidos) => {
     //Formata datas
     const data = dadosRecebidos.data;
@@ -259,38 +265,60 @@
         const duracao = diffHrs + ':' + diffMins + ' m';
 
         results[index] = {
+          tipo: "Pausa",
           nome: valor.nome,
           inicio: inicioFormat,
           fim: fimFormat,
           duracao: duracao
         }
       })
-      addLinhaEventoPausa(results)
+      addLinhaEvento(results)
     }
   }
 
-  tratarDadosTimeLine = (dados) => {
+  geraEventoDeParada = (paradas) => {
+    let results = []
+    if (paradas) {
+
+      paradas.forEach((valor, index) => {
+        const inicioFormat = dateFns.format(valor.inicio, "HH:mm:ss")
+        const fimFormat = dateFns.format(valor.fim, "HH:mm:ss")
+        const duracao = dateFns.distanceInWordsStrict(valor.fim, valor.inicio, { locale: ptBR })
+
+        results[index] = {
+          tipo: "Parada",
+          nome: valor.motivo.descricao,
+          inicio: inicioFormat,
+          fim: fimFormat,
+          duracao: duracao
+        }
+      })
+      addLinhaEvento(results)
+    }
 
   }
 
-  addLinhaEventoPausa = (pausas) => {
-    console.log(pausas)
-    pausas.forEach((pausa) => {
+  addLinhaEvento = (eventos) => {
+    console.log(eventos)
+    eventos.forEach((eventos) => {
 
       var tr = document.createElement("tr")
 
       tr.innerHTML = `
         <tr>
-          <td>Pausa</td>
-          <td>${pausa.inicio} as ${pausa.fim}</td>
-          <td>${pausa.duracao}</td>
-          <td>${pausa.nome}</td>
+          <td>${eventos.tipo}</td>
+          <td>${eventos.inicio} as ${eventos.fim}</td>
+          <td>${eventos.duracao}</td>
+          <td>${eventos.nome}</td>
         </tr>
       `
       document.getElementById('listaDeEventos').appendChild(tr)
     })
   }
 
+  tratarDadosTimeLine = (dados) => {
+    //tratar os dados do gráfico de linha do tempo
+  }
 </script>
 
 <script> //charts

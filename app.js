@@ -32,6 +32,7 @@ require('./database/index')
 const Producao = require('./models/Producao');
 const Parada = require('./models/Parada');
 const { resolve } = require('path');
+const { da } = require('date-fns/locale');
 
 //instancias do Express, Server e Socket.io
 const app = express();
@@ -88,6 +89,7 @@ module.exports = io
 //---------------------------------------------------------------------------------------
 
 let finalizada = 0
+
 io.on('connection', socket => {
 
   //Inicializa as variáveis para utilização nos eventos do escopo da conexão
@@ -95,6 +97,7 @@ io.on('connection', socket => {
   let qtd_defeito = 0
   let qtd_produzida = 0
   let status = "Rodando"
+  let paradas = {}
 
   const outrosDados = {
     status: status
@@ -115,6 +118,7 @@ io.on('connection', socket => {
     let dadosDaProducao = getDadosSessao()                 //Carrega os dados da SESSÃO
     console.log(dadosDaProducao)
     if (dadosDaProducao) {
+      enviaDadosAdicionais()
       enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
       registroVelocidadeMedia.push(dadosDaProducao.velocidade_media)
       calculaIntervalo()
@@ -131,10 +135,10 @@ io.on('connection', socket => {
   //Recebe os evendos do Server Socket-io__________________________________________________________
   socket.on('evento', (dados) => {
     console.log('veio ->' + dados.nome)
+    console.log("PARADA ------" + paradas)
 
     //Evento PRODUTO OK
     if (dados.nome === 'Produto OK' & finalizada == 0) {
-      console.log(finalizada)
       alteraStatus("Rodando")
       enviaDadosAdicionais()
       atualizaQuantidadeProduzida();
@@ -154,6 +158,7 @@ io.on('connection', socket => {
       enviaDadosAdicionais()
       registraInicioParada()
       gravaHorario()
+      limpaListaDeParadas()
     }
     if (dados.nome === 'Fim Parada' & finalizada === 0) {
       registraFimParada()
@@ -243,6 +248,26 @@ io.on('connection', socket => {
     horarioRegistroInicioUltimaParada = Date.now()
   }
 
+  listaUltimaParada = async () => {
+    await Parada.findAll({
+      include: {
+        association: 'motivo',
+        attributes: ['descricao'],
+      },
+      attributes: ['inicio', 'fim'],
+      where: { inicio: horarioRegistroInicioUltimaParada }
+    }).then((dados) => {
+      paradas = dados
+      socket.emit('dadosParada', paradas)
+    })
+  }
+
+  limpaListaDeParadas = () => {
+    while (paradas.length) {
+      paradas.pop()
+    }
+  }
+
   registraInicioParada = async () => {
     await Parada.create({
       inicio: Date.now(),
@@ -255,6 +280,8 @@ io.on('connection', socket => {
       fim: Date.now()
     }, {
       where: { inicio: horarioRegistroInicioUltimaParada }
+    }).then(() => {
+      listaUltimaParada()
     })
   }
 
