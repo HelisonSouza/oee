@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
 const { ptBR } = require('date-fns/locale');
+const { where } = require('sequelize');
 
 
 module.exports = {
@@ -18,7 +19,8 @@ module.exports = {
           [Op.or]: [
             'planejada', 'executando'
           ]
-        }
+        },
+        ativo: true
       },
       include: {
         association: 'produto',
@@ -68,10 +70,10 @@ module.exports = {
       {
         where: {
           id: id,
-          ativo: true
         }
       }
     )
+    //pega os dados da produção
     const producao = await Producao.findByPk(id, {
       include: [
         {
@@ -86,10 +88,22 @@ module.exports = {
           }
         }
       ]
-    })  //pega os dados
+    })
 
+    const pausas = await producao.getPausas()
+    var retorno = []
+    pausas.forEach((valor, index) => {
+      let inicioFormatado = datefns.format(valor.inicio, "HH:mm")
+      let fimFormatado = datefns.format(valor.fim, "HH:mm")
+      retorno[index] = {
+        nome: valor.nome,
+        inicio: inicioFormatado,
+        fim: fimFormatado,
+      }
+    })
+    console.log(retorno)
     req.session.producao = producao               //grava na sessão PRODUÇÃO
-    res.render('operacao/start')                  //rederiza a view do painel 
+    res.render('operacao/start', { pausas: retorno })                  //rederiza a view do painel 
   },
 
   /*

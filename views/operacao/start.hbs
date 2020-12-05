@@ -61,7 +61,7 @@
     </div>
     <div class="col-sm-4">
       <div class="m-auto">
-        <h4 class="">Planejado </h4>
+        <h4 class="">Produção Planejada </h4>
 
         <p class="d-inline">Produto: </p>
         <p class="d-inline ml-2" id="produto"> </p>
@@ -79,28 +79,23 @@
         <br>
         <p class="d-inline">Inicio: </p>
         <p class="d-inline" id="inicio"> </p>
-        <script>
-
-        </script>
         <p class="d-inline"></p>
         <br>
         <p class="d-inline">Fim: </p>
         <p class="d-inline" id="fim"></p>
-
+        <br>
+        <h4 class="">Pausas Programadas </h4>
+        {{#each pausas}}
+        <p>
+          {{nome}}, das {{inicio}} até {{fim}}
+        </p>
+        {{/each}}
+        {{#each producao/pausas}}
+        <br>
+        {{/each}}
       </div>
 
     </div>
-  </div>
-
-  <div class="row mt-4">
-    <div class="col-sm-12">
-      <div class="card m-auto  shadow">
-        <div class="card-body">
-          <div id="chart"></div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <div class="row mt-4">
@@ -126,8 +121,6 @@
 
 </div>
 
-
-
 <script src="/socket.io/socket.io.js"> </script>
 
 <script>
@@ -138,7 +131,7 @@
   let fim = 0
   let segundosTotais = 0
   let status = "Rodando"
-  var dadosPausas = {}
+  const paradas = {}
 
   //aponta pra o socket server
   var socket = io()
@@ -161,20 +154,17 @@
     sinalizaFimDaProducao(falta)
     atualizaDados(dadosDaProducao)
     tratarDadosTimeLine(dadosDaProducao)
-    geraEventosDePausas(dadosDaProducao)
   })
 
   //Recebe os dados adicionais
   socket.on('dadosAdicionais', (dados) => {
-    console.log(dados)
     status = dados.status
     atualizaDadosAdicionais()
   })
 
-  //Recebe os dados da ultima parada ocorida
+  //Recebe os dados das paradas ocoridas
   socket.on('dadosParada', (dados) => {
-    console.log(dados)
-    geraEventoDeParada(dados)
+    renderListaParadas(dados)
   })
 
   atualizaDados = (dadosRecebidos) => {
@@ -244,69 +234,45 @@
     }
   }
 
-  geraEventosDePausas = (dados) => {
-    let pausas = dados.pausas
-    let results = []
-    if (pausas) {
+  renderListaParadas = (paradas) => {
+    //inicializa array sem dados 
+    let results = [{
+      id: "--",
+      nome: "--",
+      inicio: "--:--",
+      fim: "--:--",
+      duracao: "--:--"
+    }]
 
-      pausas.forEach((valor, index) => {
-
-        const inicioFormat = dateFns.format(valor.inicio, "HH:mm")
-        const fimFormat = dateFns.format(valor.fim, "HH:mm")
-
-        date1 = new Date(valor.inicio),
-          date2 = new Date(valor.fim);
-
-        var diffMs = (date2 - date1);
-        var diffHrs = Math.floor((diffMs % 86400000) / 3600000);
-        var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-        diffHrs === 0 ? diffHrs = "00" : ""
-        diffMins === 0 ? diffMins = "00" : ""
-        const duracao = diffHrs + ':' + diffMins + ' m';
-
-        results[index] = {
-          tipo: "Pausa",
-          nome: valor.nome,
-          inicio: inicioFormat,
-          fim: fimFormat,
-          duracao: duracao
-        }
-      })
-      addLinhaEvento(results)
-    }
-  }
-
-  geraEventoDeParada = (paradas) => {
-    let results = []
     if (paradas) {
-
+      //formata dos dados
       paradas.forEach((valor, index) => {
         const inicioFormat = dateFns.format(valor.inicio, "HH:mm:ss")
         const fimFormat = dateFns.format(valor.fim, "HH:mm:ss")
-        const duracao = dateFns.distanceInWordsStrict(valor.fim, valor.inicio, { locale: ptBR })
-
+        const duracao = dateFns.distanceInWordsStrict(valor.fim, valor.inicio)
+        //passa os dados para o array
         results[index] = {
-          tipo: "Parada",
+          id: valor.id,
           nome: valor.motivo.descricao,
           inicio: inicioFormat,
           fim: fimFormat,
           duracao: duracao
         }
       })
-      addLinhaEvento(results)
     }
 
-  }
+    //remove as linhas da tabela para não acrescestar
+    let tabela = document.querySelector('#listaDeEventos')
+    if (tabela.childElementCount > 0) {
+      tabela.replaceChildren()
+    }
 
-  addLinhaEvento = (eventos) => {
-    console.log(eventos)
-    eventos.forEach((eventos) => {
-
+    //renderiza novas linhas na tabela
+    results.forEach((eventos) => {
       var tr = document.createElement("tr")
-
       tr.innerHTML = `
         <tr>
-          <td>${eventos.tipo}</td>
+          <td>${eventos.id}</td>
           <td>${eventos.inicio} as ${eventos.fim}</td>
           <td>${eventos.duracao}</td>
           <td>${eventos.nome}</td>
@@ -314,94 +280,7 @@
       `
       document.getElementById('listaDeEventos').appendChild(tr)
     })
+
   }
 
-  tratarDadosTimeLine = (dados) => {
-    //tratar os dados do gráfico de linha do tempo
-  }
-</script>
-
-<script> //charts
-  var options = {
-    series: [
-      // Produzindo
-      {
-        name: 'Produzindo',
-        data: [
-          {
-            x: 'Produção',
-            y: [
-              new Date(2010, 1, 1).getTime(),
-              new Date(2015, 1, 1).getTime()
-            ]
-          },
-        ]
-      },
-      // Pausa
-      {
-        name: 'Pausa',
-        data: [
-          {
-            x: 'Produção',
-            y: [
-              new Date(2015, 1, 2).getTime(),
-              new Date(2018, 1, 1).getTime()
-            ]
-          },
-        ]
-      },
-      // Parada
-      {
-        name: 'Parada',
-        data: [
-          {
-            x: 'Produção',
-            y: [
-              new Date(2018, 1, 2).getTime(),
-              new Date(2020, 1, 1).getTime()
-            ]
-          },
-        ]
-      },
-
-    ],
-    chart: {
-      height: 150,
-      type: 'rangeBar',
-      toolbar: { tools: { download: false } }
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        barHeight: '50%',
-        rangeBarGroupRows: true
-      }
-    },
-    colors: [
-      "#008FFB", "#00E396", "#ff0000"
-    ],
-    fill: {
-      type: 'solid'
-    },
-    xaxis: {
-      type: 'datetime'
-    },
-    legend: {
-      position: 'right'
-    },
-    tooltip: {
-      custom: function (opts) {
-        const fromYear = new Date(opts.y1).getFullYear()
-        const toYear = new Date(opts.y2).getFullYear()
-        const values = opts.ctx.rangeBar.getTooltipValues(opts)
-
-        return (
-          ''
-        )
-      }
-    }
-  };
-
-  var chart = new ApexCharts(document.querySelector("#chart"), options);
-  chart.render();
 </script>

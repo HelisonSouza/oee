@@ -97,7 +97,6 @@ io.on('connection', socket => {
   let qtd_defeito = 0
   let qtd_produzida = 0
   let status = "Rodando"
-  let paradas = {}
 
   const outrosDados = {
     status: status
@@ -119,6 +118,7 @@ io.on('connection', socket => {
     console.log(dadosDaProducao)
     if (dadosDaProducao) {
       enviaDadosAdicionais()
+      listaParadas()
       enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
       registroVelocidadeMedia.push(dadosDaProducao.velocidade_media)
       calculaIntervalo()
@@ -134,8 +134,7 @@ io.on('connection', socket => {
 
   //Recebe os evendos do Server Socket-io__________________________________________________________
   socket.on('evento', (dados) => {
-    console.log('veio ->' + dados.nome)
-    console.log("PARADA ------" + paradas)
+    console.log('VEIO ->' + dados.nome)
 
     //Evento PRODUTO OK
     if (dados.nome === 'Produto OK' & finalizada == 0) {
@@ -158,7 +157,6 @@ io.on('connection', socket => {
       enviaDadosAdicionais()
       registraInicioParada()
       gravaHorario()
-      limpaListaDeParadas()
     }
     if (dados.nome === 'Fim Parada' & finalizada === 0) {
       registraFimParada()
@@ -248,40 +246,38 @@ io.on('connection', socket => {
     horarioRegistroInicioUltimaParada = Date.now()
   }
 
-  listaUltimaParada = async () => {
+  // TRATA EVENTO DE PARADA_____________________________________________________________
+
+  listaParadas = async () => {          //Lista paradas e emit evento para view
     await Parada.findAll({
       include: {
         association: 'motivo',
         attributes: ['descricao'],
       },
-      attributes: ['inicio', 'fim'],
-      where: { inicio: horarioRegistroInicioUltimaParada }
-    }).then((dados) => {
-      paradas = dados
+      attributes: ['id', 'inicio', 'fim'],
+      where: { producao_id: id },
+      order: [
+        ['id', 'DESC']
+      ]
+    }).then((paradas) => {
       socket.emit('dadosParada', paradas)
     })
   }
 
-  limpaListaDeParadas = () => {
-    while (paradas.length) {
-      paradas.pop()
-    }
-  }
-
-  registraInicioParada = async () => {
+  registraInicioParada = async () => {          //Guarda o inicio da parada para o where do registro de fim
     await Parada.create({
       inicio: Date.now(),
       producao_id: id,
     })
   }
 
-  registraFimParada = async () => {
+  registraFimParada = async () => {     //registra o fim e chama a listagem
     await Parada.update({
       fim: Date.now()
     }, {
       where: { inicio: horarioRegistroInicioUltimaParada }
     }).then(() => {
-      listaUltimaParada()
+      listaParadas()
     })
   }
 
