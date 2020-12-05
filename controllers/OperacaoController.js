@@ -45,12 +45,6 @@ module.exports = {
 
     res.render('operacao/operacao', { operacao: retorno })
 
-    /*const datas = inicios.map(valor => {
-      const corrigido = datefns.format(valor.data, 'dd-MM-yyyy')
-      return corrigido
-    })
-    console.log(datas)
-    return res.json(datas)*/
   },
 
   /*

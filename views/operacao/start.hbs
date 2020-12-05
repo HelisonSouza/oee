@@ -42,7 +42,7 @@
           <div class="card p-2 m-2 shadow">
             <div class="card-body text-center">
               <h4 class="card-title">Encerramento em </h4>
-              <h1 class="text-primary font-weight-bold d-inline" id="enceraEm">00:00</h1>
+              <h1 class="text-primary font-weight-bold d-inline" id="encerraEm">--:--</h1>
             </div>
           </div>
         </div>
@@ -125,8 +125,8 @@
 
 <script>
   //inicializa variáveis
-  let encerramentoEm = 0
-  let velocidadeMedia = 0
+  let encerramentoEm = "--:--"
+  let velocidadeMedia = "00"
   let falta = "00"
   let fim = 0
   let segundosTotais = 0
@@ -153,7 +153,6 @@
     calculaFim(dadosDaProducao.data, dadosDaProducao.produto.velocidade, dadosDaProducao.qtd_planejada)
     sinalizaFimDaProducao(falta)
     atualizaDados(dadosDaProducao)
-    tratarDadosTimeLine(dadosDaProducao)
   })
 
   //Recebe os dados adicionais
@@ -177,7 +176,7 @@
     document.getElementById('realizado').innerHTML = dadosRecebidos.qtd_produzida
     document.getElementById('falta').innerHTML = falta
     document.getElementById('velocidade').innerHTML = velocidadeMedia
-    document.getElementById('enceraEm').innerHTML = encerramentoEm
+    document.getElementById('encerraEm').innerHTML = encerramentoEm
     document.getElementById('defeito').innerHTML = dadosRecebidos.qtd_defeito
     document.getElementById('produto').innerHTML = dadosRecebidos.produto.nome
     document.getElementById('quantidade').innerHTML = dadosRecebidos.qtd_planejada
@@ -201,22 +200,25 @@
   }
 
   calculaTempoEstimadoEnceramento = () => {
-    segundosTotais = (falta / velocidadeMedia) * 60
+    if (falta == 0 || velocidadeMedia == 0) {
 
-    let h = parseInt(segundosTotais / 3600)
-    let m = parseInt((segundosTotais % 3600) / 60)
-    let s = parseInt((segundosTotais % 3600) % 60)
+    } else {
+      segundosTotais = (falta / velocidadeMedia) * 60
 
-    h = ((h < 10) ? "0" : "") + h
-    m = ((m < 10) ? ":0" : ":") + m
-    s = ((s < 10) ? ":0" : ":") + s
+      let h = parseInt(segundosTotais / 3600)
+      let m = parseInt((segundosTotais % 3600) / 60)
+      let s = parseInt((segundosTotais % 3600) % 60)
 
-    h = isNaN(h) ? "00" : h
-    m = isNaN(m) ? ":00" : m
-    s = isNaN(s) ? "" : s
+      h = ((h < 10) ? "0" : "") + h
+      m = ((m < 10) ? ":0" : ":") + m
+      s = ((s < 10) ? ":0" : ":") + s
 
-    encerramentoEm = `${h}${m}${s}`
-
+      console.log(h)
+      console.log(m)
+      console.log(s)
+      console.log(`${h}${m}${s}`)
+      encerramentoEm = `${h}${m}${s}`
+    }
   }
 
   calculaFim = (dataInicio, velocidadeMedia, planejado) => {
@@ -227,7 +229,6 @@
   }
 
   sinalizaFimDaProducao = (falta) => {
-    console.log("PARA FINALIZAR PRODUÇÃO FALTA = " + falta)
     if (falta == 0) {
       console.log("ENVIOU FINALIZAR!!!!")
       socket.emit('finalizarProducao')

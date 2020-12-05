@@ -118,11 +118,11 @@ io.on('connection', socket => {
     console.log(dadosDaProducao)
     if (dadosDaProducao) {
       enviaDadosAdicionais()
-      listaParadas()
       enviaCargaDeDadosAtualizados(dadosDaProducao)          //Envia carga de dados para os clientes
       registroVelocidadeMedia.push(dadosDaProducao.velocidade_media)
       calculaIntervalo()
       finalizada = 0
+      listaParadas()
     }
   })
 
