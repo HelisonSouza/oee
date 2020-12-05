@@ -65,7 +65,12 @@ module.exports = {
     const { id } = req.params                     //pega o ID
     await Producao.update(                        //altera o status da produção inicializada
       { status: "executando" },
-      { where: { id: id } }
+      {
+        where: {
+          id: id,
+          ativo: true
+        }
+      }
     )
     const producao = await Producao.findByPk(id, {
       include: [

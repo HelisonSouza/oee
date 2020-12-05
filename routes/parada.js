@@ -6,7 +6,7 @@ const ParadaController = require('../controllers/ParadaController');
 
 routes.post('/paradas/criar', ParadaController.criar)
 routes.get('/paradas', ParadaController.listar)
-routes.post('/paradas/atribuir_motivo', ParadaController.atribuirMotivo)
+routes.get('/paradas/atribuir_motivo/:id', ParadaController.atribuirMotivo)
 routes.get('/paradas/relatorios', ParadaController.relatorios)
 
 module.exports = routes;

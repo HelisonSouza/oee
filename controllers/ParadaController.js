@@ -23,39 +23,59 @@ module.exports = {
   },
 
   async listar(req, res) {
-    const paradas = await Parada.findAll({ where: { identificada: false } })
-    var retorno = []
-    paradas.forEach((valor, index) => {
-      const newInicio = datefns.format(valor.inicio, "dd/MM/yyyy' 'HH:mm:ss", { locale: ptBR })
-      const newFim = datefns.format(valor.fim, "dd/MM/yyyy' 'HH:mm:ss", { locale: ptBR })
-      const intervalo = datefns.intervalToDuration({ start: valor.inicio, end: valor.fim })
-      let intervaloFormatado = datefns.formatDuration(intervalo, { locale: ptBR })
-
-      if (intervaloFormatado === "") intervaloFormatado = "00:00"
-
-      retorno[index] = {
-        id: valor.id,
-        inicio: newInicio,
-        fim: newFim,
-        duracao: intervaloFormatado
-      }
+    const paradas = await Parada.findAll({
+      where: { identificada: false }
     })
+
+    var results = []
+    let fimFormat
+    let duracao
+
+    if (paradas) {
+      console.log(paradas)
+      paradas.forEach((valor, index) => {
+        const inicioFormat = datefns.format(valor.inicio, "HH:mm")
+        if (valor.fim) {
+          fimFormat = datefns.format(valor.fim, "HH:mm")
+          duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+        } else {
+          fimFormat = "--:--"
+          duracao = "--:--"
+        }
+
+        if (duracao === "") duracao = "00:00"
+
+        results[index] = {
+          id: valor.id,
+          inicio: inicioFormat,
+          fim: fimFormat,
+          duracao: duracao
+        }
+      })
+
+    }
     const motivos = await Motivo.findAll({ where: { ativo: true } })
-    res.render('paradas/listar', { paradas: retorno, motivos })
+    res.render('paradas/listar', { paradas: results, motivos: motivos })
   },
 
   async atribuirMotivo(req, res) {
-    const { parada } = req.body
-    const descricaoMotivo = req.body.motivo
     try {
-      //busca o motivo que tem a descrição recebida
-      const motivo = await Motivo.findOne({ where: { descricao: descricaoMotivo } })
-
-      await Parada.update({ motivo_id: motivo.id, identificada: true }, { where: { id: parada } })
-      //console.log(motivo)
-      req.flash('msgSucesso', `A parada com Id ${parada} recebeu o motivo = ${descricaoMotivo}`)
-      res.redirect('/paradas')
-
+      const id_parada = req.params.id
+      const id_motivo = req.query.motivo
+      if (id_motivo == 1) {
+        req.flash('msgErro', 'Selecione um motivo para atribuir a parada')
+        res.redirect('/paradas')
+      } else {
+        await Parada.update({
+          motivo_id: id_motivo,
+          identificada: true
+        }, {
+          where: { id: id_parada }
+        })
+        //console.log(motivo)
+        req.flash('msgSucesso', `A parada com Id ${id_parada} identificada com sucesso.`)
+        res.redirect('/paradas')
+      }
     } catch (error) {
       req.flash('msgErro', 'Erro ao atribuir motivo a parada!' + error)
       res.redirect('/paradas')
