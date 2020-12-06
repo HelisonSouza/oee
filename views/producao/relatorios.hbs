@@ -3,6 +3,9 @@
   <div class="row">
     <div class="col-sm-8">
       <h2>Relatórios de Produção</h2>
+      {{#if query}}
+      <p>Produções de {{query.start}}, até {{query.end}}, com status {{query.status}}, incluindo {{query.ativo}}</p>
+      {{/if}}
       <table class="table">
         <thead>
           <tr>
@@ -41,30 +44,36 @@
       <!-- Formulário de consulta-->
       <div class="shadow p-3 mb-5 mt-4 bg-white rounded">
         <h4>Consulta de Produções:</h4>
-        <form class="m-2" id="formConsulta" action="/producao/relatorio">
+        <form class="m-2" action="/producao/relatorios" method="GET">
           <div class="form-group">
-            <label>Data igual á:</label>
-            <input type="date" class="form-control" name="dataExata">
-          </div>
-          <div class="form-group">
-            <label>Período iniciando de:</label>
-            <input type="date" class="form-control" name="incioPeriodo">
+            <label>Período iniciando em:</label>
+            <input type="date" class="form-control" name="start">
           </div>
           <div class="form-group">
             <label>Período finalizando em:</label>
-            <input type="date" class="form-control" name="fimPeriodo">
+            <input type="date" class="form-control" name="end">
           </div>
-          <div class="form-group">
-            <label>Lote</label>
-            <input type="number" class="form-control" name="lote" placeholder="Lote da produção">
+          <label>Status da produção:</label>
+          <div class="form-check">
+            <input type="radio" name="status" value="planejada">
+            <label> Planejada </label>
           </div>
-          <div class="form-group">
-            <label>ID do Produto</label>
-            <input type="number" class="form-control" name="produtoId" placeholder="Id do produto">
+          <div class="form-check">
+            <input type="radio" name="status" value="finalizada">
+            <label> Finalizada </label>
           </div>
-          <div class="form-group">
-            <label>Nome do Produto</label>
-            <input type="text" class="form-control" name="produtoNome" placeholder="Digite o nome do produto">
+          <div class="form-check">
+            <input type="radio" name="status" value="executando">
+            <label> Em Execução </label>
+          </div>
+          <label>Incluir:</label>
+          <div class="form-check">
+            <input type="radio" name="ativo" value="true">
+            <label> Apenas produções ativas </label>
+          </div>
+          <div class="form-check">
+            <input type="radio" name="ativo" value="false">
+            <label> Apenas produções desativadas </label>
           </div>
 
           <button type="submit" class="btn btn-primary">Consultar</button>

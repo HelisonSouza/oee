@@ -252,15 +252,46 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
   async renderRelatorios(req, res) {
     try {
       var result = []
-      const producoes = Producao.findAll({
+      let agora = new Date()
+      let dataStart = datefns.subDays(agora, 30)
+      let dataStartFormt = datefns.format(dataStart, "yyyy-MM-dd' 'HH:mm:ss", { locale: ptBR })
+      let dataEnd = datefns.addDays(agora, 1)
+      let dataEndFormat = datefns.format(dataEnd, "yyyy-MM-dd' 'HH:mm:ss", { locale: ptBR })
+
+      let {
+        start = dataStartFormt,
+        end = dataEndFormat,
+        status = "finalizada",
+        page = 1,
+        limit = 10,
+        ativo = true
+      } = req.query
+      if (!start)
+        start = dataStartFormt
+      if (!end)
+        end = dataEndFormat
+      if (!limit)
+        limit = 10
+      if (!page)
+        page = 1
+
+      page = parseInt(page - 1)
+      limit = parseInt(limit)
+
+      let { count: size, rows: producoes } = await Producao.findAndCountAll({
         where: {
-          lote: { [Op.eq]: 004 }
+          status,
+          data: { [Op.between]: [start, end] },
+          ativo
         },
+        limit,
+        offset: page * limit,
         include: {
           association: 'produto',
         }
-      }).then((dados) => {
-        dados.forEach((valor, index) => {
+      })
+      if (producoes) {
+        producoes.forEach((valor, index) => {
           const newDate = datefns.format(valor.data, "dd-MM-yyyy' 'HH:mm")
           result[index] = {
             id: valor.id,
@@ -274,10 +305,24 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
             status: valor.status
           }
         })
-      })
-      res.render('producao/relatorios', { producoes: result })
+      }
+
+      if (ativo) {
+        ativo = "apenas produções ativas"
+      } else {
+        ativo = "apenas produções desativadas"
+      }
+      let queryString = {
+        start: datefns.format(new Date(start), "dd/MM/yyyy", { locale: ptBR }),
+        end: datefns.format(new Date(end), "dd/MM/yyyy", { locale: ptBR }),
+        status,
+        ativo: ativo
+      }
+      console.log(queryString)
+
+      res.render('producao/relatorios', { producoes: result, query: queryString })
     } catch (erro) {
-      req.flash('msgErro', 'Falha no processamento da requisição')
+      req.flash('msgErro', 'Falha no processamento da requisição' + erro)
       res.redirect('/producoes')
     }
   },
