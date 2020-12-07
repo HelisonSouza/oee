@@ -28,6 +28,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^2.1.0",
     "nodemon": "^2.0.4",
+    "pdfmake": "^0.1.68",
     "sequelize": "^6.3.4",
     "socket.io": "^2.3.0"
   },

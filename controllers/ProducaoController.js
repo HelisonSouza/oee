@@ -8,6 +8,21 @@ const { ptBR } = require('date-fns/locale');
 const Validacoes = require('../validators/validacoes');
 const { Op } = require('sequelize');
 const validar = new Validacoes()
+const path = require('path')
+const fs = require('fs')
+
+const PdfPrinter = require('pdfmake')
+const fonts = {
+  Roboto: {
+    normal: path.resolve('public/fonts/Roboto-Regular.ttf'),
+    bold: path.resolve('public/fonts/Roboto-Bold.ttf'),
+    italics: path.resolve('public/fonts/Roboto-Italic.ttf'),
+    bolditalics: path.resolve('public/font/Roboto-BoldItalic.ttf')
+  }
+}
+
+let queryConsulta = {}
+const strRows = []
 
 module.exports = {
   /*
@@ -278,6 +293,8 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
       page = parseInt(page - 1)
       limit = parseInt(limit)
 
+      queryConsulta = { start, end, status, page, limit, ativo }
+
       let { count: size, rows: producoes } = await Producao.findAndCountAll({
         where: {
           status,
@@ -318,7 +335,6 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
         status,
         ativo: ativo
       }
-      console.log(queryString)
 
       res.render('producao/relatorios', { producoes: result, query: queryString })
     } catch (erro) {
@@ -333,58 +349,129 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
   --------------------------------------------------------------------------------------------------------------------------
   */
   async relatorios(req, res) {
-
-    //const { dataExata, incioPeriodo, fimPeriodo, lote, produtoId, produtoNome } = req.query
-    /*{
-      dataExata: '2020-11-11',
-      incioPeriodo: '',
-      fimPeriodo: '',
-      lote: '003',
-      produtoId: '0',
-      produtoNome: ''
-    }*/
-    let consulta = req.query
-    console.log(consulta)
-
-    const filterObj = (obj, valorNegado) => {
-
-      let keys = Object.keys(obj) //pega as keys do obj
-      let values = Object.values(obj) // pega os valores do obj
-      console.log(keys, values)
-      //.filter(value => !valorNegado.includes(value)) //monta um array com o valores sem o filtro
-      //.keys(obj) //
-      /*
-      .map(value => { obj[value]})
-      .reduce((anterior, atual) => {
-        return {
-          ...anterior,
-          ...atual
-        }
-      }, {})*/
-      return { keys, values }
-
-    }
-
-    const dados = filterObj(consulta, [""])
-    console.log(dados)
-    /*
-    for (var index in consulta) {
-      //console.log(consulta[index])
-      if (consulta[index] != "") dadosDaQuery = {index : consulta[index]}
-    }
-   
-    console.log(dadosDaQuery)
-    if(dataExata && dataExata != "") consultar.push[dataExata]
-    const producoes = await Producao.findAll({
+    //incializa as variáveis
+    let status = queryConsulta.status
+    let start = queryConsulta.start
+    let end = queryConsulta.end
+    let ativo = queryConsulta.ativo
+    let limit = queryConsulta.limit
+    let page = queryConsulta.page
+    let result = []
+    //console.log(queryConsulta)
+    //Executa a consulta
+    let { count: size, rows: producoes } = await Producao.findAndCountAll({
       where: {
-        lote: lote,
-        data: dataExata,
+        status: status,
+        data: { [Op.between]: [start, end] },
+        ativo
+      },
+      limit,
+      offset: page * limit,
+      include: {
+        association: 'produto',
       }
     })
-    console.log(req.query)
-    res.render('producao/relatorios', { producoes })
-    */
-    res.send(dados)
+    if (producoes) {
+      producoes.forEach((valor, index) => {
+        const newDate = datefns.format(valor.data, "dd-MM-yyyy' 'HH:mm")
+        let id = valor.id.toString()
+        let inicio = newDate.toString()
+        let lote = valor.lote.toString()
+        let produto = valor.produto.nome.toString()
+        let planejada = valor.qtd_planejada.toString()
+        let produzida = valor.qtd_produzida.toString()
+        let defeito = valor.qtd_defeito.toString()
+
+        result[index] = {
+          id,
+          inicio,
+          lote,
+          produto,
+          planejada,
+          produzida,
+          defeito,
+        }
+      })
+    }
+
+
+    //gerando linhas dinâmicas na tabela
+    const cows = ['id', 'Data de Inicio', 'Lote', 'Produto', 'Planejado', 'Produzido', 'Defeito']
+    const title = {
+      text: "Relatório de Produções",
+      style: {
+        fontSize: 14,
+      }
+    }
+
+    //Inserindo os dados nas linhas
+    let linhas = []
+    console.log(result)
+
+
+    result.forEach((valor, i) => {
+      let values = Object.values(valor)
+      linhas[i] = values
+    });
+
+    linhas.unshift(cows)
+
+    const printer = new PdfPrinter(fonts)
+
+    const docDefiniton = {
+      content: [
+        {
+          image: path.resolve('public/img/logo.png'),
+          fit: [100, 100],
+        },
+        { text: title },
+
+        {
+          table: {
+            widths: [30, 100, '*', '*', '*', '*', '*'],
+            body: linhas
+          }
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 14,
+        }
+      },
+      footer: (page, pages) => {
+        return {
+          columns: [
+            'Relatório com dados do sistema Radar 4.0',
+            {
+              alignment: 'right',
+              text: [
+                { text: page.toString(), italics: true },
+                ' de ',
+                { text: pages.toString(), italics: true },
+              ]
+            }
+          ],
+          margin: [40, 0]
+        }
+      }
+    }
+
+
+
+    const pdf = printer.createPdfKitDocument(docDefiniton)
+    pdf.pipe(fs.createWriteStream('relatorios/doc.pdf'))
+    pdf.end()
+
+    /*
+    const pdf = await printer.createPdfKitDocument(
+      { content: "Olá Teste pdf" }
+    )
+    res.header('Content-disposition', 'inline; filename=Relatório.pdf')
+    res.header('Content-type', 'aplication/pdf')
+    await pdf.pipe(res)
+    pdf.end*/
+
+    res.redirect('/')
   },
 
 }

@@ -6,7 +6,7 @@
       {{#if query}}
       <p>Produções de {{query.start}}, até {{query.end}}, com status {{query.status}}, incluindo {{query.ativo}}</p>
       {{/if}}
-      <table class="table">
+      <table class="table" id="tabela">
         <thead>
           <tr>
             <th scope="col">id</th>
@@ -80,7 +80,17 @@
           <button type="reset" class="btn btn-secondary">Cancelar</button>
       </div>
       </form>
+      <a href="/producao/relatorio">
+        <button type="button" id="printRelatorio" class="btn btn-secondary">Imprimir Relatório</button>
+      </a>
     </div>
   </div>
 </div>
 </div>
+
+<script>
+  let btn = document.getElementById('printRelatorio')
+  btn.addEventListener('click', () => {
+    console.log("PRINT PDF")
+  })
+</script>

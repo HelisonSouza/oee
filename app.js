@@ -17,6 +17,18 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const datefns = require('date-fns')
 
+const PdfPrinter = require('pdfmake')
+const fonts = {
+  Roboto: {
+    normal: '../public/fonts/Roboto-Regular.ttf',
+    bold: '../public/fonts/Roboto-Bold.ttf',
+    italics: '../public/fonts/Roboto-Italic.ttf',
+    bolditalics: '../public/font/Roboto-BoldItalic.ttf'
+  }
+}
+
+module.exports = fonts
+
 // Rotas
 const usuario = require('./routes/usuario')
 const motivo = require('./routes/motivo')
@@ -82,7 +94,7 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 //Serviço
 server.listen(3000)
 
-module.exports = io
+module.exports = app
 
 //---------------------------------------------------------------------------------------
 //   Socket.io
