@@ -3,7 +3,10 @@ const { Op } = require('sequelize');
 const Validacoes = require('../validators/validacoes')
 const validar = new Validacoes()
 const datefns = require('date-fns');
+const { ptBR } = require('date-fns/locale');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
+
+let queryConsulta = {}
 
 module.exports = {
   /*
@@ -17,7 +20,7 @@ module.exports = {
     const { nome, descricao } = req.body
     //passando velocidade para um float    
     const velocidade = parseFloat(req.body.velocidade)
-    
+
     if (velocidade == 'NaN') {
       req.flash('msgErro', 'O valor do campo velocidade deve ser um número, tente novamente')
       res.redirect('/produtos')
@@ -31,7 +34,7 @@ module.exports = {
     if (!validar.isValid()) {
       const erros = validar.errors()
       erros.forEach((value) => {
-        
+
         req.flash('msgErro', `${value.message}`)
       })
       res.redirect('/produtos')
@@ -195,20 +198,43 @@ RENDER VIEW RELATÓRIO DE PRODUTOS
 */
   async renderRelatorios(req, res) {
     try {
-      let inicioPeriodo = new Date("2020-07-07")
-      let fimPeriodo = new Date("2050-07-07")
-
-      if (req.query.inicioPeriodo) inicioPeriodo = req.query.inicioPeriodo
-      if (req.query.fimPeriodo) fimPeriodo = req.query.fimPeriodo
-
       var result = []
+      let agora = new Date()
+      let dataStart = datefns.subDays(agora, 30)
+      let dataStartFormt = datefns.format(dataStart, "yyyy-MM-dd' 'HH:mm:ss", { locale: ptBR })
+      let dataEnd = datefns.addDays(agora, 1)
+      let dataEndFormat = datefns.format(dataEnd, "yyyy-MM-dd' 'HH:mm:ss", { locale: ptBR })
+
+      let {
+        nome = '',
+        start = dataStartFormt,
+        end = dataEndFormat,
+        page = 1,
+        limit = 10,
+        ativo = true
+      } = req.query
+      if (!start)
+        start = dataStartFormt
+      if (!end)
+        end = dataEndFormat
+      if (!limit)
+        limit = 10
+      if (!page)
+        page = 1
+
+      page = parseInt(page - 1)
+      limit = parseInt(limit)
+
+      queryConsulta = { start, end, page, limit, ativo }
+
       const produtos = await Produto.findAll({
         where: {
-          createdAt: {
-            [Op.gte]: inicioPeriodo,
-            [Op.lt]: fimPeriodo
-          }
-        }
+          ativo,
+          nome: { [Op.like]: `%${nome}%` },
+          createdAt: { [Op.between]: [start, end] }
+        },
+        limit,
+        offset: page * limit
       }).then((dados) => {
         dados.forEach((valor, index) => {
           const newDate = datefns.format(valor.createdAt, "dd-MM-yyyy' 'HH:mm")
