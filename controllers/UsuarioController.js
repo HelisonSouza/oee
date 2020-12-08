@@ -58,9 +58,14 @@ module.exports = {
             tipo: usuario.tipo
           }
         }, secret.segredo, { expiresIn: '24h' })
+        //Dados publicos
+        const user = {
+          nome: usuario.nome,
+          tipo: usuario.tipo
+        }
         //grava o tokem na sessão e retorna a home
         req.session.token = { 'token': token }
-        res.render('home/index', { token: token })
+        res.render('home/index', { usuario: user })
       }
     } catch (error) {
       req.flash('msgErro', 'Dados inválidos' + error)
@@ -179,7 +184,7 @@ module.exports = {
     validar.isValid(nome, '   Nome inválido ')
     validar.hasMinLen(nome, 2, '   Nome muito curto ')
     validar.isEmail(email, '   E-mail inválido')
-    validar.isRequired(senha, '   Senha inválido ')
+    validar.isRequired(senha, '   Senha inválida ')
     validar.hasMinLen(senha, 4, '   Senha muito curta ')
     validar.isRequired(tipo, '   Tipo de permisão não informada ')
 
@@ -313,5 +318,11 @@ module.exports = {
     }
 
   },
+  async logout(req, res) {
+    req.session.destroy((err) => {
+      console.log(err)
+    })
+    res.redirect('/login')
+  }
 
 }

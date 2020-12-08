@@ -10,7 +10,7 @@ module.exports = {
             //verifica se o token foi informado
             if (!token) {
                 req.flash('msgErro', 'Token de autorização não informado')
-                res.redirect('/')
+                res.redirect('/login')
             }
 
             //verificação pesada do token
@@ -23,7 +23,7 @@ module.exports = {
                     return next();
                 } else {
                     req.flash('msgErro', 'Usuário logado não tem permissão para acessar esta parte do sistema!')
-                    res.redirect('/')
+                    res.redirect('/index')
                 }
 
             })
@@ -39,7 +39,7 @@ module.exports = {
             //verifica se o token foi informado
             if (!token) {
                 req.flash('msgErro', 'Token de autorização não informado')
-                res.redirect('/')
+                res.redirect('/login')
             }
 
             //verificação pesada do token
@@ -52,7 +52,7 @@ module.exports = {
                     return next();
                 } else {
                     req.flash('msgErro', 'Usuário logado não tem permissão para acessar esta parte do sistema!')
-                    res.redirect('/')
+                    res.redirect('/index')
                 }
 
             })
@@ -68,7 +68,7 @@ module.exports = {
             //verifica se o token foi informado
             if (!token) {
                 req.flash('msgErro', 'Token de autorização não informado')
-                res.redirect('/')
+                res.redirect('/login')
             }
 
             //verificação pesada do token
@@ -81,7 +81,7 @@ module.exports = {
                     return next();
                 } else {
                     req.flash('msgErro', 'Usuário logado não tem permissão para acessar esta parte do sistema!')
-                    res.redirect('/')
+                    res.redirect('/index')
                 }
 
             })
@@ -97,7 +97,7 @@ module.exports = {
             //verifica se o token foi informado
             if (!token) {
                 req.flash('msgErro', 'Token de autorização não informado')
-                res.redirect('/')
+                res.redirect('/login')
             }
 
             //verificação pesada do token
@@ -110,7 +110,7 @@ module.exports = {
                     return next();
                 } else {
                     req.flash('msgErro', 'Usuário logado não tem permissão para acessar esta parte do sistema!')
-                    res.redirect('/')
+                    res.redirect('/index')
                 }
 
             })

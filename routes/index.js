@@ -5,8 +5,11 @@ const Parada = require('../models/Parada');
 const datefns = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 const { Op } = require('sequelize');
+routes.get('/', (req, res) => {
+  res.redirect('/login')
+})
 
-routes.get('/', async (req, res) => {
+routes.get('/index', async (req, res) => {
   try {
 
     let data = new Date()

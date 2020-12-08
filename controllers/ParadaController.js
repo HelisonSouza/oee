@@ -5,6 +5,18 @@ const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
 const { ptBR } = require('date-fns/locale');
 const Usuario = require('../models/Usuario');
+const path = require('path')
+const fs = require('fs')
+
+const PdfPrinter = require('pdfmake')
+const fonts = {
+  Roboto: {
+    normal: path.resolve('public/fonts/Roboto-Regular.ttf'),
+    bold: path.resolve('public/fonts/Roboto-Bold.ttf'),
+    italics: path.resolve('public/fonts/Roboto-Italic.ttf'),
+    bolditalics: path.resolve('public/font/Roboto-BoldItalic.ttf')
+  }
+}
 
 let queryConsulta = {}
 
@@ -165,4 +177,135 @@ module.exports = {
       res.redirect('/paradas')
     }
   },
+
+
+
+  //==================================================================================
+
+
+
+  async relatorio(req, res) {
+    console.log(queryConsulta)
+    //incializa as variáveis de consulta
+    let start = queryConsulta.start
+    let end = queryConsulta.end
+    let producao = queryConsulta.producao
+    let results = []
+
+    //Gera as strings de auxilio
+    let srtStart = datefns.format(new Date(start), "dd/MM/yyyy", { locale: ptBR })
+    let strEnd = datefns.format(new Date(end), "dd/MM/yyyy", { locale: ptBR })
+
+    //Executa consulta
+    const paradas = await Parada.findAll({
+      where: {
+        createdAt: { [Op.between]: [start, end] },
+        producao_id: { [Op.like]: `%${producao}%` },
+      },
+      limit: 10,
+      include: {
+        association: 'motivo',
+      },
+    })
+
+    paradas.forEach((valor, index) => {
+      let fimFormat
+      let duracao
+      const inicioFormat = datefns.format(valor.inicio, "dd/MM/yyyy'  'HH:mm")
+      if (valor.fim) {
+        fimFormat = datefns.format(valor.fim, "dd/MM/yyyy'  'HH:mm")
+        duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+      }
+
+      let fim = fimFormat ? fimFormat : '--:--'
+
+      //console.log(results)
+
+      results[index] = {
+        id: valor.id,
+        producao: (valor.producao_id ? valor.producao_id : '--'),
+        inicio: (inicioFormat ? inicioFormat : '--'),
+        fim: (fim ? fim : '--'),
+        duracao: (duracao ? duracao : '--'),
+        motivo: (valor.motivo.descricao ? valor.motivo.descricao : '--'),
+      }
+    })
+
+    //gerando linhas dinâmicas na tabela
+    const cows = ['id', 'Producao', 'Inicio', 'Fim', 'Duração', 'Motivo']
+    const title = {
+      text: "Relatório de Produções",
+      style: {
+        fontSize: 14,
+      }
+    }
+
+    const descricao = {
+      text: `Praradas de ${srtStart}, até ${strEnd}`,
+      style: {
+        fontSize: 10,
+      }
+    }
+
+    //Inserindo os dados nas linhas
+    let linhas = []
+
+    results.forEach((valor, i) => {
+      let values = Object.values(valor)
+      linhas[i] = values
+    });
+
+    linhas.unshift(cows)
+
+    const printer = new PdfPrinter(fonts)
+
+    //Definição descritiva do relatório
+    const docDefiniton = {
+      content: [
+        {
+          image: path.resolve('public/img/logo.png'),
+          fit: [100, 100],
+        },
+        { text: title },
+        { text: descricao },
+
+        {
+          table: {
+            widths: [25, 60, '*', '*', '*', 150],
+            body: linhas
+          }
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 14,
+        }
+      },
+      footer: (page, pages) => {
+        return {
+          columns: [
+            'Relatório com dados do sistema Radar 4.0',
+            {
+              alignment: 'right',
+              text: [
+                { text: page.toString(), italics: true },
+                ' de ',
+                { text: pages.toString(), italics: true },
+              ]
+            }
+          ],
+          margin: [40, 0]
+        }
+      }
+    }
+
+    let dataAgora = new Date()
+    let carimbo = datefns.getTime(dataAgora)
+
+    const pdf = printer.createPdfKitDocument(docDefiniton)
+    pdf.pipe(fs.createWriteStream(path.resolve(`public/relatorios/Relatório de Paradas - ${carimbo}.pdf`)))
+    pdf.end()
+
+    res.redirect('/paradas/relatorios')
+  }
 }

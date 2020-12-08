@@ -497,3 +497,11 @@
   chartEvolucao.render();
 
 </script>
+
+{{#if usuario}}
+<script>
+  let nome = '{{ usuario.nome }}'
+  let tipo = '{{ usuario.tipo }}'
+  sessionStorage.setItem('nome', nome);
+</script>
+{{/if}}
