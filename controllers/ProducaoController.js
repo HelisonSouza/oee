@@ -349,7 +349,7 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
   --------------------------------------------------------------------------------------------------------------------------
   */
   async relatorios(req, res) {
-    //incializa as variáveis
+    //incializa as variáveis de consulta
     let status = queryConsulta.status
     let start = queryConsulta.start
     let end = queryConsulta.end
@@ -357,7 +357,12 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
     let limit = queryConsulta.limit
     let page = queryConsulta.page
     let result = []
-    //console.log(queryConsulta)
+    //Gera as strings de auxilio
+    let strStatus = status
+    let srtStart = datefns.format(new Date(start), "dd/MM/yyyy", { locale: ptBR })
+    let strEnd = datefns.format(new Date(end), "dd/MM/yyyy", { locale: ptBR })
+    let strAtivo = ativo ? 'ativas' : 'desativadas'
+
     //Executa a consulta
     let { count: size, rows: producoes } = await Producao.findAndCountAll({
       where: {
@@ -404,6 +409,13 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
       }
     }
 
+    const descricao = {
+      text: `Produções de ${srtStart}, até ${strEnd}, com situação ${strStatus}, incluindo apenas produções ${strAtivo}`,
+      style: {
+        fontSize: 10,
+      }
+    }
+
     //Inserindo os dados nas linhas
     let linhas = []
     console.log(result)
@@ -418,6 +430,7 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
 
     const printer = new PdfPrinter(fonts)
 
+    //Definição descritiva do relatório
     const docDefiniton = {
       content: [
         {
@@ -425,6 +438,7 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
           fit: [100, 100],
         },
         { text: title },
+        { text: descricao },
 
         {
           table: {
@@ -456,22 +470,23 @@ RENDERIZAR O FORMULÁRIO DE ATRIBUIÇÃO DE PAUSAS
       }
     }
 
-
+    let dataAgora = new Date()
+    let carimbo = datefns.getTime(dataAgora)
 
     const pdf = printer.createPdfKitDocument(docDefiniton)
-    pdf.pipe(fs.createWriteStream('relatorios/doc.pdf'))
+    pdf.pipe(fs.createWriteStream(path.resolve(`public/relatorios/Relatório de Producao - ${carimbo}.pdf`)))
     pdf.end()
 
     /*
     const pdf = await printer.createPdfKitDocument(
       { content: "Olá Teste pdf" }
-    )
+      )
     res.header('Content-disposition', 'inline; filename=Relatório.pdf')
     res.header('Content-type', 'aplication/pdf')
     await pdf.pipe(res)
     pdf.end*/
 
-    res.redirect('/')
+    res.redirect('/producao/relatorios')
   },
 
 }

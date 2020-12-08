@@ -1,26 +1,37 @@
 <div class="container bg-light">
   <div class="row align-items-center">
-    <div class="col-9">
+    <div class="col-8">
       <h3>Dashboard - Indicadores do mês</h3>
     </div>
-    <div class="col-3">
-      <form>
-        <div class="form-group">
-          <select class="form-control" name="mesInformado">
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="02">Março</option>
-            <option value="02">Abril</option>
-            <option value="02">Maio</option>
-            <option value="02">Junho</option>
-            <option value="02">Julho</option>
-            <option value="02">Agosto</option>
-            <option value="02">Setembro</option>
-            <option value="02">Outubro</option>
-            <option value="02">Novembro</option>
-            <option value="02">Dezembro</option>
+    <div class="col-4">
+      <form class="form-inline">
+        <div class="form-group p-2">
+          <select class="form-control" name="mes">
+            <option value=1>Janeiro</option>
+            <option value=2>Fevereiro</option>
+            <option value=3>Março</option>
+            <option value=4>Abril</option>
+            <option value=5>Maio</option>
+            <option value=6>Junho</option>
+            <option value=7>Julho</option>
+            <option value=8>Agosto</option>
+            <option value=9>Setembro</option>
+            <option value=10>Outubro</option>
+            <option value=11>Novembro</option>
+            <option value=12 selected>Dezembro</option>
           </select>
         </div>
+        <div class="form-group p-2">
+          <select class="form-control" name="ano">
+            <option value="2020" selected>2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2022">2023</option>
+            <option value="2022">2024</option>
+            <option value="2022">2025</option>
+          </select>
+        </div class="p-2">
+        <button type="submit" class="btn btn-secondary"> Consultar</button>
       </form>
     </div>
   </div>

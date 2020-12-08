@@ -25,7 +25,8 @@ class Producao extends Model {
           foreignKey: 'producao_id',
           through: 'Producao_Pausas',
           as: 'pausas'
-        })
+        }),
+      this.hasMany(models.Parada, { foreignKey: 'producao_id', as: 'paradas' })
   }
 }
 
