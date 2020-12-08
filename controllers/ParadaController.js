@@ -4,6 +4,9 @@ const { Op } = require('sequelize');
 const datefns = require('date-fns');
 const { endOfDecadeWithOptions } = require('date-fns/fp');
 const { ptBR } = require('date-fns/locale');
+const Usuario = require('../models/Usuario');
+
+let queryConsulta = {}
 
 module.exports = {
   async criar(req, res) {
@@ -85,36 +88,78 @@ module.exports = {
 
   async relatorios(req, res) {
     try {
+      var result = []
+      let agora = new Date()
+      let dataStart = datefns.subDays(agora, 30)
+      let dataStartFormt = datefns.format(dataStart, "yyyy-MM-dd' 'HH:mm:ss", { locale: ptBR })
+      let dataEnd = datefns.addDays(agora, 1)
+      let dataEndFormat = datefns.format(dataEnd, "yyyy-MM-dd' 'HH:mm:ss", { locale: ptBR })
+
+      let {
+        start = dataStartFormt,
+        end = dataEndFormat,
+        motivo = '',
+        producao = '',
+        page = 1,
+        limit = 10,
+      } = req.query
+      if (!start)
+        start = dataStartFormt
+      if (!end)
+        end = dataEndFormat
+      if (!limit)
+        limit = 10
+      if (!page)
+        page = 1
+
+      page = parseInt(page - 1)
+      limit = parseInt(limit)
+
+      queryConsulta = { start, end, motivo, producao, page, limit }
+
       const paradas = await Parada.findAll({
         where: {
-          motivo_id: {
-            [Op.eq]: 4
-          }
+          createdAt: { [Op.between]: [start, end] },
+          producao_id: { [Op.like]: `%${producao}%` },
         },
-        include: [
-          { association: 'motivo' },
-          { association: 'usuario' }
-        ]
+        limit,
+        offset: page * limit,
+        include: {
+          association: 'motivo',
+        },
       })
-      console.log(paradas)
+
       let results = []
       paradas.forEach((valor, index) => {
+        let fimFormat
+        let duracao
         const inicioFormat = datefns.format(valor.inicio, "dd/MM/yyyy'  'HH:mm")
-        const fimFormat = datefns.format(valor.fim, "dd/MM/yyyy'  'HH:mm")
-        const duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+        if (valor.fim) {
+          fimFormat = datefns.format(valor.fim, "dd/MM/yyyy'  'HH:mm")
+          duracao = datefns.formatDistanceStrict(valor.inicio, valor.fim, { locale: ptBR })
+        }
+
+        let fim = fimFormat ? fimFormat : '--:--'
 
         results[index] = {
+          producao: valor.producao_id,
           id: valor.id,
           inicio: inicioFormat,
-          fim: fimFormat,
+          fim: fim,
           duracao: duracao,
-          usuario: valor.usuario.nome,
           motivo: valor.motivo.descricao,
 
         }
-        //console.log(results)
       })
-      return res.render('paradas/relatorios', { paradas: results })
+
+      let queryString = {
+        start: datefns.format(new Date(start), "dd/MM/yyyy", { locale: ptBR }),
+        end: datefns.format(new Date(end), "dd/MM/yyyy", { locale: ptBR }),
+        motivo: motivo,
+        producao: producao
+      }
+
+      res.render('paradas/relatorios', { paradas: results, query: queryString })
     } catch (erro) {
       req.flash('msgErro', 'Falha no processamento da requisição' + erro)
       res.redirect('/paradas')

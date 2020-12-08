@@ -12,9 +12,9 @@ class Parada extends Model {
   }
 
   static associate(models) {
-    this.belongsTo(models.Usuario, { foreignKey: 'usuario_id', as: 'usuario' }),
-      this.belongsTo(models.Motivo, { foreignKey: 'motivo_id', as: 'motivo' }),
-      this.belongsTo(models.Producao, { foreignKey: 'producao_id', as: 'producao' })
+    this.belongsTo(models.Usuario, { foreignKey: 'usuario_id', as: 'usuario' })
+    this.belongsTo(models.Motivo, { foreignKey: 'motivo_id', as: 'motivo' })
+    this.belongsTo(models.Producao, { foreignKey: 'producao_id', as: 'producao' })
   }
 }
 
